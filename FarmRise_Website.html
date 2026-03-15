@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c8a3c">
+<meta name="description" content="FarmRise - Complete Agricultural Platform for Farmers">
+<title>FarmRise — Smart Farming Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --g1:#0d5c20;--g2:#1c8a3c;--g3:#25a84e;--g4:#52c472;--g5:#d4f0dc;--g6:#eaf7ee;--g7:#f0fbf3;
+  --amber:#d97706;--amberL:#fef3c7;--red:#dc2626;--redL:#fee2e2;
+  --blue:#1d4ed8;--blueL:#dbeafe;--purple:#7c3aed;--purpleL:#ede9fe;
+  --text:#111827;--text2:#374151;--text3:#6b7280;--text4:#9ca3af;
+  --bg:#f3faf5;--bg2:#ffffff;--bg3:#f9fafb;
+  --border:#d1fae5;--border2:#e5e7eb;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 10px 40px rgba(0,0,0,.12);
+  --r:12px;--r2:18px;--r3:24px;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+input,select,textarea{font-family:inherit}
+img{max-width:100%}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--g3);border-radius:3px}
+::-webkit-scrollbar-track{background:var(--g7)}
+
+/* ══════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════ */
+.hide{display:none!important}
+.fade{animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.pulse-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:var(--g5);color:var(--g1)}
+.badge-amber{background:var(--amberL);color:#92400e}
+.badge-red{background:var(--redL);color:#7f1d1d}
+.badge-blue{background:var(--blueL);color:#1e40af}
+.badge-purple{background:var(--purpleL);color:#5b21b6}
+.badge-new{background:var(--red);color:#fff}
+.card{background:var(--bg2);border-radius:var(--r2);border:1px solid var(--border2);padding:20px;transition:all .2s}
+.card:hover{box-shadow:var(--shadow-md)}
+
+/* ══════════════════════════════════════════
+   TOAST & NOTIFICATIONS
+══════════════════════════════════════════ */
+#toastContainer{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-item{background:#1f2937;color:#fff;padding:13px 18px;border-radius:50px;font-size:13px;font-weight:500;
+  opacity:0;transform:translateX(50px);transition:all .35s;pointer-events:none;
+  border-left:3px solid var(--g3);white-space:nowrap;max-width:360px}
+.toast-item.show{opacity:1;transform:translateX(0)}
+.toast-item.success{border-left-color:#22c55e}
+.toast-item.error{border-left-color:var(--red)}
+.toast-item.warn{border-left-color:var(--amber)}
+.toast-item.info{border-left-color:var(--blue)}
+
+/* Push notification bar */
+#notifBar{position:fixed;top:0;left:0;right:0;background:var(--g1);color:#fff;z-index:9998;padding:10px 20px;display:none;align-items:center;justify-content:space-between;font-size:13px;font-weight:500}
+#notifBar.show{display:flex}
+.nb-close{background:rgba(255,255,255,.2);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+
+/* Notification panel */
+#notifPanel{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#fff;z-index:5000;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.15);display:flex;flex-direction:column}
+#notifPanel.open{right:0}
+.np-header{padding:20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--g7)}
+.np-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--g1)}
+.np-close{width:32px;height:32px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:.15s}
+.np-close:hover{background:var(--redL);color:var(--red)}
+.np-items{flex:1;overflow-y:auto;padding:12px}
+.np-item{display:flex;gap:12px;padding:13px;border-radius:var(--r);cursor:pointer;transition:.15s;margin-bottom:6px;border:1px solid transparent}
+.np-item:hover{background:var(--g7);border-color:var(--border)}
+.np-item.unread{background:var(--g6);border-color:var(--border)}
+.npi-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.npi-green{background:var(--g5)}
+.npi-amber{background:var(--amberL)}
+.npi-red{background:var(--redL)}
+.npi-blue{background:var(--blueL)}
+.npi-title{font-weight:700;font-size:13px;color:var(--text)}
+.npi-body{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.5}
+.npi-time{font-size:10px;color:var(--text4);margin-top:4px}
+.np-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:4999;display:none}
+.np-overlay.show{display:block}
+
+/* ══════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════ */
+#navbar{background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;padding:0 5%}
+.nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;height:68px;gap:20px}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
+.nl-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--g2),var(--g3));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.nl-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g1)}
+.nl-badge{background:var(--g3);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:2px}
+.nav-search{flex:1;max-width:480px;position:relative}
+.ns-input{width:100%;padding:10px 44px 10px 16px;border:1.5px solid var(--border2);border-radius:50px;font-size:14px;outline:none;transition:.2s;background:#fff}
+.ns-input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(37,164,78,.1)}
+.ns-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px;background:none;border:none;cursor:pointer}
+.nav-links{display:flex;gap:2px;flex:1;justify-content:center}
+.nl-btn{padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text2);transition:.15s;border:none;background:transparent;cursor:pointer;white-space:nowrap}
+.nl-btn:hover{background:var(--g6);color:var(--g2)}
+.nl-btn.active{background:var(--g5);color:var(--g1);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-icon-btn{width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.15s;position:relative}
+.nav-icon-btn:hover{background:var(--g6);border-color:var(--border)}
+.nav-icon-btn .badge-dot{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.coin-chip{display:flex;align-items:center;gap:6px;background:var(--amberL);border:1.5px solid #fbbf24;border-radius:50px;padding:5px 14px 5px 5px;cursor:pointer;transition:.15s}
+.coin-chip:hover{background:#fde68a}
+.cc-icon{width:28px;height:28px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.cc-val{font-size:14px;font-weight:700;color:var(--text)}
+.user-btn{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:50px;background:var(--g6);border:1px solid var(--border);cursor:pointer;transition:.15s}
+.user-btn:hover{background:var(--g5)}
+.ub-av{width:30px;height:30px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700}
+.ub-name{font-size:13px;font-weight:600;color:var(--g1)}
+
+/* ══════════════════════════════════════════
+   SIDEBAR (Desktop)
+══════════════════════════════════════════ */
+.app-layout{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:240px 1fr;gap:24px;padding:24px 5%;min-height:calc(100vh - 68px)}
+.sidebar{position:sticky;top:92px;height:fit-content}
+.sidebar-nav{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);overflow:hidden}
+.sn-item{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;transition:.15s;border-left:3px solid transparent}
+.sn-item:hover{background:var(--g7);color:var(--g2)}
+.sn-item.active{background:var(--g6);color:var(--g1);border-left-color:var(--g2);font-weight:700}
+.sn-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg3);flex-shrink:0;transition:.15s}
+.sn-item.active .sn-icon{background:var(--g5)}
+.sn-label{font-size:14px;font-weight:500}
+.sn-item.active .sn-label{font-weight:700}
+.sn-count{margin-left:auto;background:var(--red);color:#fff;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.sidebar-weather{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--r2);padding:16px;color:#fff;margin-top:14px}
+.sw-loc{font-size:12px;opacity:.75;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.sw-row{display:flex;align-items:center;gap:12px}
+.sw-temp{font-family:'Syne',sans-serif;font-size:36px;font-weight:800}
+.sw-icon{font-size:36px}
+.sw-desc{font-size:13px;opacity:.85;margin-top:4px}
+.sw-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+.sws{background:rgba(255,255,255,.12);border-radius:8px;padding:8px;text-align:center}
+.sws-v{font-size:15px;font-weight:700}
+.sws-l{font-size:10px;opacity:.7;margin-top:1px}
+
+/* ══════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════ */
+.main-content{min-width:0}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .3s ease}
+
+/* ══════════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════════ */
+.hero-banner{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 50%,#1a6b35 100%);border-radius:var(--r3);padding:32px 36px;color:#fff;position:relative;overflow:hidden;margin-bottom:24px}
+.hb-bg{position:absolute;right:-20px;bottom:-20px;font-size:140px;opacity:.1;pointer-events:none}
+.hb-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:50px;padding:5px 14px;font-size:12px;font-weight:600;margin-bottom:14px}
+.hb-h1{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;line-height:1.15;margin-bottom:10px}
+.hb-desc{font-size:15px;opacity:.8;max-width:480px;line-height:1.6;margin-bottom:24px}
+.hb-btns{display:flex;gap:12px;flex-wrap:wrap}
+.hb-stats{display:flex;gap:28px;margin-top:24px}
+.hbs{text-align:center}
+.hbs-n{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800}
+.hbs-l{font-size:11px;opacity:.65;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Buttons */
+.btn{padding:10px 22px;border-radius:50px;font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:7px;border:none;cursor:pointer}
+.btn-primary{background:var(--g2);color:#fff}
+.btn-primary:hover{background:var(--g1);transform:translateY(-1px);box-shadow:0 6px 20px rgba(28,138,60,.3)}
+.btn-white{background:#fff;color:var(--g1)}
+.btn-white:hover{background:var(--g6);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5)}
+.btn-outline:hover{background:rgba(255,255,255,.15)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#b45309}
+.btn-ghost{background:var(--g7);color:var(--g2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--g6)}
+.btn-sm{padding:7px 16px;font-size:13px}
+.btn-lg{padding:14px 32px;font-size:16px;border-radius:60px}
+.btn-xl{padding:16px 40px;font-size:17px;border-radius:60px}
+.btn-block{width:100%;justify-content:center}
+.btn-red{background:var(--redL);color:var(--red)}
+.btn-red:hover{background:#fca5a5}
+
+/* Quick Actions Grid */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sh-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--g1)}
+.sh-link{font-size:13px;color:var(--g2);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;margin-bottom:28px}
+.qa-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s}
+.qa-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--g4)}
+.qac-icon{font-size:36px;margin-bottom:10px;display:block}
+.qac-label{font-size:13px;font-weight:600;color:var(--text2);line-height:1.3}
+
+/* Market overview cards */
+.market-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.mo-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.mo-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.mo-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--g7),transparent);opacity:0;transition:.2s}
+.mo-card:hover::before{opacity:1}
+.moc-crop{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.moc-emoji{font-size:26px}
+.moc-name{font-weight:700;font-size:14px;color:var(--text)}
+.moc-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--g1)}
+.moc-unit{font-size:11px;color:var(--text3)}
+.moc-trend{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;margin-top:5px}
+.trend-up{color:#16a34a}.trend-dn{color:var(--red)}
+
+/* ══════════════════════════════════════════
+   MANDI PAGE
+══════════════════════════════════════════ */
+.mandi-hero{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--r3);padding:28px;color:#fff;margin-bottom:24px}
+.mh-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px}
+.mh-sub{font-size:14px;opacity:.8}
+.mh-search{display:flex;gap:10px;margin-top:18px}
+.mh-search input{flex:1;padding:12px 18px;border-radius:50px;border:none;font-size:14px;outline:none}
+.mh-search button{padding:12px 24px;border-radius:50px;background:var(--amber);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer}
+
+/* Crop filter row */
+.crop-filter-row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:20px}
+.crop-filter-row::-webkit-scrollbar{display:none}
+.cfr-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-width:70px}
+.cfr-circle{width:60px;height:60px;border-radius:50%;background:#fff;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px;transition:.15s}
+.cfr-item.active .cfr-circle{border-color:var(--g2);background:var(--g6)}
+.cfr-label{font-size:11px;font-weight:600;color:var(--text3);text-align:center;white-space:nowrap}
+.cfr-item.active .cfr-label{color:var(--g2)}
+
+/* Mandi filters */
+.mandi-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.mf-sort{display:flex;gap:6px}
+.mf-sort-btn{padding:8px 18px;border-radius:50px;border:1.5px solid var(--border2);background:#fff;font-size:13px;font-weight:600;color:var(--text2);transition:.15s;cursor:pointer}
+.mf-sort-btn.active{background:var(--g2);color:#fff;border-color:var(--g2)}
+.mf-radius{padding:8px 16px;border-radius:50px;border:1.5px solid var(--border2);background:#fff;font-size:13px;color:var(--text2);outline:none;cursor:pointer}
+
+/* Mandi table/cards */
+.mandi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.mandi-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:18px;transition:all .2s;position:relative}
+.mandi-card:hover{box-shadow:var(--shadow-md);border-color:var(--g4)}
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.mc-left{}
+.mc-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text)}
+.mc-dist{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
+.mc-price-wrap{text-align:right}
+.mc-price{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)}
+.mc-date{font-size:11px;color:var(--text3);margin-top:2px}
+.mc-trend-up{color:var(--g2)}.mc-trend-dn{color:var(--red)}
+.mc-bar{height:6px;background:var(--bg3);border-radius:3px;margin:12px 0;overflow:hidden}
+.mc-bar-fill{height:100%;background:linear-gradient(90deg,var(--g3),var(--g4));border-radius:3px;transition:width .8s}
+.mc-bottom{display:flex;align-items:center;justify-content:space-between}
+.mc-follow{padding:7px 18px;border-radius:50px;background:var(--g2);color:#fff;font-size:12px;font-weight:700;transition:.15s}
+.mc-follow:hover{background:var(--g1)}
+.mc-follow.followed{background:var(--g6);color:var(--g2);border:1.5px solid var(--g3)}
+.mc-prev{color:var(--g2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px}
+.mc-highest-tag{position:absolute;top:-10px;left:16px;background:var(--amber);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px;display:flex;align-items:center;gap:4px}
+
+/* Price History Chart */
+.price-chart-section{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:20px;margin-bottom:24px}
+
+/* ══════════════════════════════════════════
+   SHOP (Meesho/Dmart style)
+══════════════════════════════════════════ */
+.shop-hero{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.shop-banner{border-radius:var(--r2);padding:22px;color:#fff;cursor:pointer;position:relative;overflow:hidden;min-height:140px;display:flex;flex-direction:column;justify-content:flex-end}
+.shop-banner:nth-child(1){background:linear-gradient(135deg,#1565C0,#1976D2)}
+.shop-banner:nth-child(2){background:linear-gradient(135deg,#c2185b,#e91e63)}
+.shop-banner:nth-child(3){background:linear-gradient(135deg,#e65100,#ef6c00)}
+.shop-banner:nth-child(4){background:linear-gradient(135deg,#1b5e20,var(--g2))}
+.sb-bg{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.2}
+.sb-tag{background:rgba(255,255,255,.25);border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;display:inline-block;margin-bottom:6px}
+.sb-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1.2}
+.sb-sub{font-size:12px;opacity:.85;margin-top:3px}
+
+/* Category chips */
+.cat-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:20px}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-chip{flex-shrink:0;padding:8px 18px;border-radius:50px;background:#fff;border:1.5px solid var(--border2);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;transition:.15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.cat-chip:hover,.cat-chip.active{background:var(--g2);color:#fff;border-color:var(--g2)}
+
+/* Flash sale */
+.flash-sale-header{background:linear-gradient(135deg,var(--red),#ef4444);border-radius:var(--r2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;color:#fff}
+.fsh-left{display:flex;align-items:center;gap:10px}
+.fsh-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.fsh-countdown{background:rgba(0,0,0,.3);border-radius:8px;padding:4px 12px;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:1px}
+
+/* Product cards */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+.prod-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);overflow:hidden;cursor:pointer;transition:all .2s}
+.prod-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--g4)}
+.pc-img{aspect-ratio:1;background:var(--g7);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.pc-discount{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px}
+.pc-wishlist{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.15s}
+.pc-wishlist:hover{background:#fff;transform:scale(1.1)}
+.pc-body{padding:12px}
+.pc-brand{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+.pc-name{font-weight:700;font-size:14px;color:var(--text);margin-top:2px;line-height:1.3}
+.pc-stars{color:#f59e0b;font-size:11px;margin-top:4px;display:flex;align-items:center;gap:3px}
+.pc-stars-count{color:var(--text3);font-size:11px}
+.pc-price-row{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.pc-price{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--g1)}
+.pc-mrp{font-size:12px;color:var(--text4);text-decoration:line-through}
+.pc-off{font-size:11px;font-weight:700;color:var(--red)}
+.pc-add{width:100%;margin-top:10px;padding:8px;border-radius:8px;background:var(--g6);color:var(--g2);font-size:13px;font-weight:700;border:1.5px solid var(--border);transition:.15s}
+.pc-add:hover{background:var(--g2);color:#fff}
+.pc-add.in-cart{background:var(--g2);color:#fff}
+
+/* Cart */
+.cart-sidebar{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#fff;z-index:3000;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.cart-sidebar.open{right:0}
+.cart-header{padding:18px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--g7)}
+.ch-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--g1)}
+.ch-close{width:32px;height:32px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+.ch-close:hover{background:var(--redL);color:var(--red)}
+.cart-items{flex:1;overflow-y:auto;padding:14px}
+.cart-item{display:flex;gap:12px;padding:12px;border-radius:var(--r);background:var(--bg3);margin-bottom:8px;align-items:center}
+.ci-img{width:50px;height:50px;border-radius:8px;background:var(--g7);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-weight:700;font-size:13px;color:var(--text)}
+.ci-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.ci-ctrl{display:flex;align-items:center;gap:8px;margin-top:6px}
+.ci-ctrl-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border2);background:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.ci-ctrl-btn:hover{border-color:var(--g3);color:var(--g2)}
+.ci-qty{font-size:14px;font-weight:700;min-width:20px;text-align:center}
+.ci-price{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--g2);flex-shrink:0}
+.ci-del{color:var(--text3);font-size:15px;cursor:pointer;padding:4px;transition:.15s}
+.ci-del:hover{color:var(--red)}
+.cart-footer{padding:16px 20px;border-top:1px solid var(--border2)}
+.cf-row{display:flex;justify-content:space-between;font-size:14px;color:var(--text3);margin-bottom:6px}
+.cf-row.total{font-weight:700;font-size:17px;color:var(--text);border-top:1px solid var(--border2);padding-top:10px;margin-top:4px}
+.cf-row.total span:last-child{color:var(--g2)}
+.cart-empty{text-align:center;padding:60px 20px}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2999;display:none}
+.cart-overlay.show{display:block}
+
+/* ══════════════════════════════════════════
+   ADVISORY PAGE
+══════════════════════════════════════════ */
+.advisory-layout{display:grid;grid-template-columns:300px 1fr;gap:20px}
+.adv-sidebar{}
+.adv-main{}
+.my-crops-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:18px;margin-bottom:16px}
+.mc-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mc-card-title{font-weight:700;font-size:15px;color:var(--text)}
+.mc-manage{color:var(--g2);font-size:13px;font-weight:600;cursor:pointer}
+.crop-item-adv{display:flex;align-items:center;gap:10px;padding:11px;border-radius:var(--r);background:var(--g7);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:.15s}
+.crop-item-adv:hover{background:var(--g6)}
+.cia-emoji{width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.cia-info{flex:1}
+.cia-name{font-weight:700;font-size:14px;color:var(--text)}
+.cia-sow{font-size:11px;color:var(--text3);margin-top:2px}
+.cia-update{display:inline-block;margin-top:4px;background:var(--redL);border:1px solid #fca5a5;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--red)}
+.cia-arrow{color:var(--text4);font-size:16px}
+
+/* Advisory cards */
+.adv-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:20px;margin-bottom:16px}
+.adv-card-title{font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.pest-alert{border-radius:var(--r);padding:14px;margin-bottom:10px}
+.pa-high{background:var(--redL);border:1px solid #fca5a5}
+.pa-med{background:var(--amberL);border:1px solid #fcd34d}
+.pa-low{background:var(--g7);border:1px solid var(--border)}
+.pa-title{font-weight:800;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pa-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Crop doctor */
+.crop-doctor-card{background:var(--g7);border:2px dashed var(--g5);border-radius:var(--r2);padding:28px;text-align:center;cursor:pointer;transition:.2s}
+.crop-doctor-card:hover{background:var(--g6);border-color:var(--g3)}
+.cdc-icon{font-size:52px;margin-bottom:12px}
+.cdc-title{font-weight:700;font-size:16px;color:var(--g1);margin-bottom:6px}
+.cdc-desc{font-size:13px;color:var(--text3);line-height:1.5}
+
+/* ══════════════════════════════════════════
+   VIDEOS PAGE
+══════════════════════════════════════════ */
+.video-filter-row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:20px}
+.video-filter-row::-webkit-scrollbar{display:none}
+.videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.video-card{background:#000;border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.video-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.vc-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;background:linear-gradient(135deg,#0d3b12,#1a6e2e)}
+.vc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 40%,transparent)}
+.vc-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text);transition:.2s}
+.video-card:hover .vc-play{background:#fff;transform:translate(-50%,-50%) scale(1.1)}
+.vc-info{position:absolute;bottom:0;left:0;right:0;padding:14px}
+.vc-channel{font-size:10px;color:rgba(255,255,255,.7);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.vc-title{font-size:13px;font-weight:700;color:#fff;line-height:1.4}
+.vc-views{font-size:10px;color:rgba(255,255,255,.6);margin-top:4px}
+
+/* ══════════════════════════════════════════
+   PROFILE/MORE PAGE
+══════════════════════════════════════════ */
+.profile-hero{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--r3);padding:28px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:20px}
+.ph-avatar{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0}
+.ph-info{flex:1}
+.ph-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.ph-role{font-size:14px;opacity:.8;margin-top:3px}
+.ph-stats{display:flex;gap:20px;margin-top:14px}
+.phs{text-align:center}
+.phs-n{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.phs-l{font-size:10px;opacity:.7;margin-top:1px}
+.settings-section{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px}
+.ss-title{font-weight:700;font-size:14px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:12px 18px;background:var(--bg3);border-bottom:1px solid var(--border2)}
+.ss-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--bg3);cursor:pointer;transition:.15s}
+.ss-item:last-child{border-bottom:none}
+.ss-item:hover{background:var(--g7)}
+.ss-icon{width:36px;height:36px;border-radius:9px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ss-label{flex:1;font-size:14px;font-weight:500;color:var(--text)}
+.ss-arrow{color:var(--g3);font-size:16px}
+.ss-badge{background:var(--red);color:#fff;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:700;margin-right:8px}
+.toggle-sw{position:relative;width:44px;height:24px;display:inline-block}
+.toggle-sw input{display:none}
+.sw-tr{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:.3s}
+.sw-tr.on{background:var(--g3)}
+.sw-th{position:absolute;height:18px;width:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;pointer-events:none}
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:8000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:var(--r3);padding:32px;width:100%;max-width:520px;animation:modalPop .35s cubic-bezier(.34,1.56,.64,1);max-height:90vh;overflow-y:auto;position:relative}
+@keyframes modalPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.modal-close:hover{background:var(--redL);color:var(--red)}
+.modal-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--g1);margin-bottom:6px}
+.modal-sub{font-size:14px;color:var(--text3);margin-bottom:22px}
+
+/* Form */
+.form-field{margin-bottom:16px}
+.form-field label{display:block;font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.form-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:14px;outline:none;transition:.2s;background:#fff;color:var(--text)}
+.form-inp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(37,164,78,.1)}
+
+/* ══════════════════════════════════════════
+   GOVT SCHEMES
+══════════════════════════════════════════ */
+.schemes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.scheme-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:18px;cursor:pointer;transition:all .2s}
+.scheme-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--g4)}
+.scc-top{display:flex;gap:12px;margin-bottom:10px}
+.scc-icon{width:48px;height:48px;border-radius:12px;background:var(--g6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.scc-title{font-weight:700;font-size:15px;color:var(--text);line-height:1.3}
+.scc-desc{font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:10px}
+.scc-btns{display:flex;gap:8px}
+
+/* ══════════════════════════════════════════
+   NEARBY RETAILERS
+══════════════════════════════════════════ */
+.retailers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.retailer-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);padding:18px;transition:all .2s}
+.retailer-card:hover{box-shadow:var(--shadow-md)}
+.rc-header{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.rc-avatar{width:50px;height:50px;border-radius:12px;background:var(--g6);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.rc-name{font-weight:700;font-size:15px;color:var(--text)}
+.rc-dist{font-size:12px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:4px}
+.rc-stars{color:#f59e0b;font-size:13px;margin-top:3px}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rc-btns{display:flex;gap:8px}
+.rc-call{background:var(--g2);color:#fff;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:.15s}
+.rc-call:hover{background:var(--g1)}
+.rc-whatsapp{background:#25D366;color:#fff;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:.15s}
+.rc-whatsapp:hover{background:#1faf57}
+.rc-directions{background:var(--blueL);color:var(--blue);border-radius:50px;padding:8px 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;transition:.15s}
+
+/* ══════════════════════════════════════════
+   PHONE CONNECT FEATURE
+══════════════════════════════════════════ */
+.phone-connect-section{background:linear-gradient(135deg,var(--purple),#9333ea);border-radius:var(--r3);padding:28px;color:#fff;margin-bottom:24px}
+.pcs-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.pcs-desc{font-size:14px;opacity:.85;line-height:1.6;margin-bottom:20px}
+.pcs-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.pcs-step{background:rgba(255,255,255,.15);border-radius:12px;padding:14px;text-align:center}
+.pcs-step-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;opacity:.5;margin-bottom:4px}
+.pcs-step-text{font-size:12px;line-height:1.4}
+.pcs-input-row{display:flex;gap:10px}
+.pcs-phone-inp{flex:1;padding:13px 18px;border-radius:50px;border:none;font-size:14px;outline:none;color:var(--text)}
+.pcs-connect-btn{padding:13px 24px;border-radius:50px;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.4);color:#fff;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s}
+.pcs-connect-btn:hover{background:rgba(255,255,255,.35)}
+
+/* ══════════════════════════════════════════
+   NEWS SECTION
+══════════════════════════════════════════ */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.news-card{background:#fff;border-radius:var(--r2);border:1px solid var(--border2);overflow:hidden;cursor:pointer;transition:all .2s}
+.news-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.nc-img{height:140px;background:var(--g7);display:flex;align-items:center;justify-content:center;font-size:56px}
+.nc-body{padding:14px}
+.nc-tag{margin-bottom:7px}
+.nc-title{font-weight:700;font-size:14px;color:var(--text);line-height:1.4}
+.nc-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.nc-date{font-size:11px;color:var(--text4)}
+.nc-read{font-size:12px;font-weight:600;color:var(--g2)}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:1100px){
+  .app-layout{grid-template-columns:200px 1fr}
+  .advisory-layout{grid-template-columns:260px 1fr}
+}
+@media(max-width:900px){
+  .app-layout{grid-template-columns:1fr;padding:16px 4%}
+  .sidebar{display:none}
+  .nav-links{display:none}
+  .advisory-layout{grid-template-columns:1fr}
+  .shop-hero{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .hero-banner{padding:22px 20px}
+  .hb-h1{font-size:1.5rem}
+  .hb-stats{gap:16px}
+  .quick-grid{grid-template-columns:repeat(3,1fr)}
+  .shop-hero{grid-template-columns:1fr}
+  .products-grid{grid-template-columns:repeat(2,1fr)}
+  .pcs-steps{grid-template-columns:1fr}
+  .cart-sidebar{width:100%;right:-100%}
+  #notifPanel{width:100%;right:-100%}
+  .nav-search{display:none}
+}
+@media(max-width:420px){
+  .products-grid{grid-template-columns:1fr 1fr}
+  .quick-grid{grid-template-columns:repeat(3,1fr)}
+  .nav-inner{height:58px}
+}
+
+/* Mobile bottom nav */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border2);z-index:100;padding:6px 0 10px}
+.mn-items{display:flex;justify-content:space-around}
+.mn-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 12px;border-radius:8px;transition:.15s;position:relative}
+.mn-icon{font-size:22px;color:var(--text3)}
+.mn-label{font-size:10px;font-weight:600;color:var(--text3)}
+.mn-item.active .mn-icon{color:var(--g2)}
+.mn-item.active .mn-label{color:var(--g2);font-weight:700}
+.mn-dot{position:absolute;top:3px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid #fff}
+@media(max-width:900px){
+  .mobile-nav{display:block}
+  .main-content{padding-bottom:70px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
+<!-- NOTIFICATION BAR -->
+<div id="notifBar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="pulse-dot"></div>
+    <span id="notifBarMsg">🌾 Corn prices at HUBLI mandi rose 8% today — sell now!</span>
+  </div>
+  <div class="nb-close" onclick="document.getElementById('notifBar').classList.remove('show')">✕</div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="np-overlay" id="npOverlay" onclick="closeNotifPanel()"></div>
+<div id="notifPanel">
+  <div class="np-header">
+    <div class="np-title">🔔 Notifications</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="font-size:12px;color:var(--g2);font-weight:600;cursor:pointer" onclick="markAllRead()">Mark all read</span>
+      <div class="np-close" onclick="closeNotifPanel()">✕</div>
+    </div>
+  </div>
+  <div class="np-items" id="notifItems"></div>
+</div>
+
+<!-- CART OVERLAY + SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <div class="ch-title">🛒 My Cart</div>
+    <div class="ch-close" onclick="closeCart()">✕</div>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showPage('home')">
+      <div class="nl-icon">🌾</div>
+      <div class="nl-text">FarmRise<span class="nl-badge">PRO</span></div>
+    </div>
+    <div class="nav-search">
+      <input class="ns-input" type="text" placeholder="Search crops, products, schemes..." id="globalSearch" oninput="globalSearchFn(this.value)">
+      <button class="ns-btn"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <button class="nl-btn active" id="nl-home" onclick="showPage('home')">🏠 Home</button>
+      <button class="nl-btn" id="nl-mandi" onclick="showPage('mandi')">₹ Mandi</button>
+      <button class="nl-btn" id="nl-shop" onclick="showPage('shop')">🛒 Shop</button>
+      <button class="nl-btn" id="nl-advisory" onclick="showPage('advisory')">🌱 Advisory</button>
+      <button class="nl-btn" id="nl-videos" onclick="showPage('videos')">▶ Videos</button>
+      <button class="nl-btn" id="nl-more" onclick="showPage('more')">☰ More</button>
+    </div>
+    <div class="nav-right">
+      <div class="coin-chip" onclick="showPage('more')">
+        <div class="cc-icon">B</div>
+        <div class="cc-val" id="coinsDisplay">0</div>
+      </div>
+      <div class="nav-icon-btn" onclick="openNotifPanel()" title="Notifications">
+        🔔<div class="badge-dot" id="notifBadge">3</div>
+      </div>
+      <div class="nav-icon-btn" onclick="openCart()" title="Cart">
+        🛒<div class="badge-dot" id="cartBadge" style="display:none">0</div>
+      </div>
+      <div class="user-btn" onclick="showPage('more')">
+        <div class="ub-av" id="navAvatar">U</div>
+        <div class="ub-name" id="navName">My Farm</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-nav">
+      <div class="sn-item active" id="sn-home" onclick="showPage('home')">
+        <div class="sn-icon">🏠</div><div class="sn-label">Home</div>
+      </div>
+      <div class="sn-item" id="sn-mandi" onclick="showPage('mandi')">
+        <div class="sn-icon">₹</div><div class="sn-label">Mandi Prices</div>
+      </div>
+      <div class="sn-item" id="sn-shop" onclick="showPage('shop')">
+        <div class="sn-icon">🛒</div><div class="sn-label">Shop</div>
+      </div>
+      <div class="sn-item" id="sn-advisory" onclick="showPage('advisory')">
+        <div class="sn-icon">🌱</div><div class="sn-label">Advisory</div>
+      </div>
+      <div class="sn-item" id="sn-videos" onclick="showPage('videos')">
+        <div class="sn-icon">▶</div><div class="sn-label">Videos</div>
+      </div>
+      <div class="sn-item" id="sn-schemes" onclick="showPage('schemes')">
+        <div class="sn-icon">🏛️</div><div class="sn-label">Govt Schemes</div>
+      </div>
+      <div class="sn-item" id="sn-retailers" onclick="showPage('retailers')">
+        <div class="sn-icon">🏪</div><div class="sn-label">Nearby Retailers</div>
+      </div>
+      <div class="sn-item" id="sn-news" onclick="showPage('news')">
+        <div class="sn-icon">📰</div><div class="sn-label">Agri News</div><div class="sn-count">6</div>
+      </div>
+      <div class="sn-item" id="sn-more" onclick="showPage('more')">
+        <div class="sn-icon">👤</div><div class="sn-label">Profile</div>
+      </div>
+    </div>
+    <!-- Weather widget -->
+    <div class="sidebar-weather">
+      <div class="sw-loc">📍 Belagavi, KA</div>
+      <div class="sw-row">
+        <div class="sw-icon">⛅</div>
+        <div><div class="sw-temp">28°C</div><div class="sw-desc">Partly Cloudy</div></div>
+      </div>
+      <div class="sw-stats">
+        <div class="sws"><div class="sws-v">72%</div><div class="sws-l">Humidity</div></div>
+        <div class="sws"><div class="sws-v">No Rain</div><div class="sws-l">Forecast</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ══ HOME PAGE ══════════════════════════ -->
+    <div class="page active" id="homePage">
+      <!-- Hero -->
+      <div class="hero-banner">
+        <div class="hb-bg">🌾</div>
+        <div class="hb-tag"><div class="pulse-dot"></div>Smart Farming Platform</div>
+        <h1 class="hb-h1">Grow Smarter,<br>Earn Better 🌱</h1>
+        <p class="hb-desc">Real-time mandi prices, expert advisory, crop doctor, government schemes and direct retailer connect — all in one place.</p>
+        <div class="hb-btns">
+          <button class="btn btn-white btn-lg" onclick="showPage('mandi')">📊 Check Mandi Prices</button>
+          <button class="btn btn-outline btn-lg" onclick="showPage('advisory')">🌱 Get Advisory</button>
+        </div>
+        <div class="hb-stats">
+          <div class="hbs"><div class="hbs-n" id="hc1">0</div><div class="hbs-l">Farmers</div></div>
+          <div class="hbs"><div class="hbs-n" id="hc2">0</div><div class="hbs-l">Mandis</div></div>
+          <div class="hbs"><div class="hbs-n">₹0</div><div class="hbs-l">Commission</div></div>
+          <div class="hbs"><div class="hbs-n" id="hc4">0</div><div class="hbs-l">Schemes</div></div>
+        </div>
+      </div>
+
+      <!-- Phone Connect Feature -->
+      <div class="phone-connect-section">
+        <div class="pcs-title">📱 Connect Your Phone — Get SMS Alerts!</div>
+        <div class="pcs-desc">Register your phone number to receive real-time mandi price alerts, weather warnings, pest outbreak notifications, and crop advisory directly as SMS on your mobile.</div>
+        <div class="pcs-steps">
+          <div class="pcs-step"><div class="pcs-step-num">1</div><div class="pcs-step-text">Enter your mobile number</div></div>
+          <div class="pcs-step"><div class="pcs-step-num">2</div><div class="pcs-step-text">Verify with OTP</div></div>
+          <div class="pcs-step"><div class="pcs-step-num">3</div><div class="pcs-step-text">Get instant SMS alerts</div></div>
+        </div>
+        <div class="pcs-input-row">
+          <input class="pcs-phone-inp" type="tel" placeholder="📱 Enter mobile number (e.g. 9876543210)" id="phoneConnectInp" maxlength="10">
+          <button class="pcs-connect-btn" onclick="connectPhone()">Get Alerts →</button>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-header">
+        <div class="sh-title">Quick Actions</div>
+        <div class="sh-link" onclick="showPage('more')">View all <i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="quick-grid" id="quickGrid"></div>
+
+      <!-- Live Market Prices -->
+      <div class="section-header">
+        <div class="sh-title">📊 Live Market Prices</div>
+        <div class="sh-link" onclick="showPage('mandi')">Full Mandi <i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="market-overview" id="marketOverview"></div>
+
+      <!-- Flash Products -->
+      <div class="flash-sale-header">
+        <div class="fsh-left">
+          <span style="font-size:22px">⚡</span>
+          <div class="fsh-title">Flash Sale — Today Only!</div>
+        </div>
+        <div class="fsh-countdown" id="flashTimer">02:34:18</div>
+      </div>
+      <div class="products-grid" id="homeProducts"></div>
+
+      <!-- Price Chart -->
+      <div class="price-chart-section">
+        <div class="section-header" style="margin-bottom:16px">
+          <div class="sh-title">📈 Price Trends — Last 7 Days</div>
+          <select class="form-inp" style="width:auto;padding:7px 14px;font-size:13px" onchange="updateChart(this.value)">
+            <option value="corn">🌽 Corn</option>
+            <option value="tomato">🍅 Tomato</option>
+            <option value="onion">🧅 Onion</option>
+            <option value="wheat">🌾 Wheat</option>
+          </select>
+        </div>
+        <canvas id="priceChart" height="120"></canvas>
+      </div>
+
+      <!-- Latest News -->
+      <div class="section-header">
+        <div class="sh-title">📰 Latest Agri News</div>
+        <div class="sh-link" onclick="showPage('news')">All News <i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="news-grid" id="homeNews"></div>
+    </div>
+
+    <!-- ══ MANDI PAGE ══════════════════════════ -->
+    <div class="page" id="mandiPage">
+      <div class="mandi-hero">
+        <div class="mh-title">📊 Mandi Prices — Live</div>
+        <div class="mh-sub">Real-time wholesale market prices from mandis across India</div>
+        <div class="mh-search">
+          <input type="text" placeholder="Search crop name or mandi location..." id="mandiSearch" oninput="filterMandi()">
+          <button onclick="filterMandi()">Search</button>
+        </div>
+      </div>
+      <!-- Crop filter -->
+      <div class="crop-filter-row" id="mandiCropRow"></div>
+      <!-- Variety tabs -->
+      <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:16px" id="varietyTabsRow"></div>
+      <!-- Filters -->
+      <div class="mandi-filters">
+        <div class="mf-sort">
+          <button class="mf-sort-btn active" onclick="sortMandi('dist',this)">📍 Distance</button>
+          <button class="mf-sort-btn" onclick="sortMandi('price',this)">₹ Price</button>
+          <button class="mf-sort-btn" onclick="sortMandi('trend',this)">📈 Trend</button>
+        </div>
+        <select class="mf-radius" id="mandiRadius" onchange="filterMandi()">
+          <option value="100">Within 100 km</option>
+          <option value="300" selected>Within 300 km</option>
+          <option value="500">Within 500 km</option>
+          <option value="9999">All India</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="showHighOnly" onchange="filterMandi()" style="accent-color:var(--g3)"> Highest Price Only
+        </label>
+      </div>
+      <!-- Price chart for selected crop -->
+      <div class="price-chart-section" style="margin-bottom:20px">
+        <div class="section-header" style="margin-bottom:14px">
+          <div class="sh-title" id="mandiChartTitle">Corn — Price History</div>
+        </div>
+        <canvas id="mandiChart" height="100"></canvas>
+      </div>
+      <!-- Mandi list -->
+      <div style="font-size:14px;color:var(--text3);margin-bottom:12px"><span id="mandiResultCount">0</span> mandis found</div>
+      <div class="mandi-grid" id="mandiGrid"></div>
+    </div>
+
+    <!-- ══ SHOP PAGE (Meesho+DMart style) ═════ -->
+    <div class="page" id="shopPage">
+      <!-- Banners -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px">
+        <div class="shop-banner" onclick="filterShop('Seeds')">
+          <div class="sb-bg">🌱</div>
+          <div class="sb-tag">Best Sellers</div>
+          <div class="sb-title">Premium Seeds</div>
+          <div class="sb-sub">Hybrid & certified varieties</div>
+        </div>
+        <div class="shop-banner" onclick="filterShop('Pesticides')">
+          <div class="sb-bg">🧴</div>
+          <div class="sb-tag">New Arrivals</div>
+          <div class="sb-title">Bayer Products</div>
+          <div class="sb-sub">Pesticides & fungicides</div>
+        </div>
+        <div class="shop-banner" onclick="filterShop('Fertilizers')">
+          <div class="sb-bg">🌿</div>
+          <div class="sb-tag">Offers</div>
+          <div class="sb-title">Fertilizers</div>
+          <div class="sb-sub">Up to 25% off this week</div>
+        </div>
+        <div class="shop-banner" onclick="filterShop('Equipment')">
+          <div class="sb-bg">⚙️</div>
+          <div class="sb-tag">Hot Deal</div>
+          <div class="sb-title">Farm Equipment</div>
+          <div class="sb-sub">Pumps, sprayers & tools</div>
+        </div>
+      </div>
+      <!-- Flash sale -->
+      <div class="flash-sale-header" style="margin-bottom:0">
+        <div class="fsh-left"><span style="font-size:22px">⚡</span><div class="fsh-title">Flash Sale Ends In:</div></div>
+        <div class="fsh-countdown" id="shopFlashTimer">02:34:18</div>
+      </div>
+      <!-- Category filter -->
+      <div class="cat-scroll" id="shopCatScroll" style="margin-top:16px"></div>
+      <!-- Products -->
+      <div class="section-header">
+        <div class="sh-title" id="shopSectionTitle">All Products</div>
+        <div style="font-size:13px;color:var(--text3)" id="shopCount">0 products</div>
+      </div>
+      <div class="products-grid" id="shopGrid"></div>
+    </div>
+
+    <!-- ══ ADVISORY PAGE ══════════════════════ -->
+    <div class="page" id="advisoryPage">
+      <div class="section-header">
+        <div class="sh-title">🌱 Crop Advisory</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('addCropModal')">+ Add Crop</button>
+      </div>
+      <div class="advisory-layout">
+        <div>
+          <!-- My crops -->
+          <div class="my-crops-card">
+            <div class="mc-card-header">
+              <div class="mc-card-title">My Crops</div>
+              <div class="mc-manage" onclick="openModal('addCropModal')">✏️ Manage</div>
+            </div>
+            <div id="myCropsList"></div>
+          </div>
+          <!-- Weather advisory -->
+          <div class="adv-card">
+            <div class="adv-card-title">🌦️ Farm Weather</div>
+            <div style="background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--r);padding:14px;color:#fff;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:32px">⛅</span>
+                <div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">28°C</div><div style="font-size:12px;opacity:.8">Partly Cloudy · No Rain</div></div>
+              </div>
+              <div style="font-size:12px;opacity:.85;line-height:1.6">✅ Good day to spray pesticides<br>⚠️ Rain expected Tuesday — delay irrigation</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <!-- Crop doctor -->
+          <div class="crop-doctor-card" onclick="showCropDoctorModal()">
+            <div class="cdc-icon">🩺</div>
+            <div class="cdc-title">Crop Doctor — AI Disease Diagnosis</div>
+            <div class="cdc-desc">Upload a photo of your crop and our AI will identify diseases, pests and suggest the best treatment with Bayer products.</div>
+            <button class="btn btn-primary" style="margin-top:14px">Upload Crop Photo →</button>
+          </div>
+          <!-- Pest alerts -->
+          <div class="adv-card" style="margin-top:16px">
+            <div class="adv-card-title">🐛 Active Pest & Disease Alerts</div>
+            <div id="pestAlertsList"></div>
+          </div>
+          <!-- AI Recommendations -->
+          <div class="adv-card" style="margin-top:16px">
+            <div class="adv-card-title">🤖 AI Crop Recommendations</div>
+            <div id="aiRecsList"></div>
+          </div>
+          <!-- Other crops to add -->
+          <div class="adv-card" style="margin-top:16px">
+            <div class="adv-card-title">➕ Add More Crops for Advisory</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px" id="addCropGrid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ VIDEOS PAGE ══════════════════════ -->
+    <div class="page" id="videosPage">
+      <div class="section-header">
+        <div class="sh-title">▶ Farm Videos</div>
+      </div>
+      <div class="video-filter-row" id="videoFilterRow"></div>
+      <div class="videos-grid" id="videosGrid"></div>
+    </div>
+
+    <!-- ══ SCHEMES PAGE ══════════════════════ -->
+    <div class="page" id="schemesPage">
+      <div class="section-header" style="margin-bottom:20px">
+        <div class="sh-title">🏛️ Government Schemes</div>
+      </div>
+      <div class="phone-connect-section" style="background:linear-gradient(135deg,#1e40af,#2563eb);margin-bottom:24px">
+        <div class="pcs-title">📱 Get Scheme Updates on Your Phone</div>
+        <div class="pcs-desc">Register your mobile number to receive alerts when new government schemes are announced or existing deadlines approach.</div>
+        <div class="pcs-input-row">
+          <input class="pcs-phone-inp" type="tel" placeholder="Enter mobile number" id="schemesPhoneInp" maxlength="10">
+          <button class="pcs-connect-btn" onclick="connectPhone('schemes')">Subscribe →</button>
+        </div>
+      </div>
+      <div class="schemes-grid" id="schemesGrid"></div>
+    </div>
+
+    <!-- ══ RETAILERS PAGE ══════════════════ -->
+    <div class="page" id="retailersPage">
+      <div class="section-header" style="margin-bottom:16px">
+        <div class="sh-title">🏪 Nearby Retailers</div>
+        <div style="display:flex;gap:8px">
+          <select class="form-inp" style="width:auto;padding:7px 14px;font-size:13px" onchange="filterRetailers(this.value)">
+            <option>All</option><option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Equipment</option>
+          </select>
+          <select class="form-inp" style="width:auto;padding:7px 14px;font-size:13px">
+            <option>5 km</option><option>10 km</option><option selected>25 km</option><option>50 km</option>
+          </select>
+        </div>
+      </div>
+      <div style="background:var(--g6);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--g1);font-weight:600;display:flex;align-items:center;gap:8px">
+        📍 Showing retailers near Belagavi, Karnataka — <span style="color:var(--g2)" id="retailerCount">0</span> found
+      </div>
+      <div class="retailers-grid" id="retailersGrid"></div>
+    </div>
+
+    <!-- ══ NEWS PAGE ════════════════════════ -->
+    <div class="page" id="newsPage">
+      <div class="section-header"><div class="sh-title">📰 Agriculture News & Updates</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="newsFilterRow"></div>
+      <div class="news-grid" id="newsGrid"></div>
+    </div>
+
+    <!-- ══ MORE / PROFILE PAGE ══════════════ -->
+    <div class="page" id="morePage">
+      <!-- Profile hero -->
+      <div class="profile-hero">
+        <div class="ph-avatar">👨‍🌾</div>
+        <div class="ph-info">
+          <div class="ph-name" id="profileHeroName">Your Name</div>
+          <div class="ph-role">Farmer · Belagavi, Karnataka</div>
+          <div class="ph-stats">
+            <div class="phs"><div class="phs-n" id="profileOrders">0</div><div class="phs-l">Orders</div></div>
+            <div class="phs"><div class="phs-n" id="profileCoins">0</div><div class="phs-l">Coins</div></div>
+            <div class="phs"><div class="phs-n" id="profileCrops">0</div><div class="phs-l">Crops</div></div>
+          </div>
+        </div>
+        <button class="btn btn-white" onclick="openModal('editProfileModal')">✏️ Edit Profile</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="settings-section">
+            <div class="ss-title">Quick Links</div>
+            <div class="ss-item" onclick="showPage('mandi')"><div class="ss-icon">₹</div><div class="ss-label">Mandi Prices</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="showPage('news')"><div class="ss-icon">📰</div><div class="ss-label">Agri News</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="showPage('schemes')"><div class="ss-icon">🏛️</div><div class="ss-label">Government Schemes</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="showPage('retailers')"><div class="ss-icon">🏪</div><div class="ss-label">Nearby Retailers</div><div class="ss-arrow">›</div></div>
+          </div>
+          <div class="settings-section">
+            <div class="ss-title">My Services</div>
+            <div class="ss-item" onclick="showCropDoctorModal()"><div class="ss-icon">🩺</div><div class="ss-label">Crop Doctor</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="openModal('verifyModal')"><div class="ss-icon">🔍</div><div class="ss-label">Verify Bayer Products</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="showPage('shop')"><div class="ss-icon">🧪</div><div class="ss-label">Explore Products</div><div class="ss-arrow">›</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="settings-section">
+            <div class="ss-title">My Account</div>
+            <div class="ss-item" onclick="openModal('coinsModal')">
+              <div class="ss-icon">🎁</div><div class="ss-label">Bayer Coins</div>
+              <span class="ss-badge">New</span><div class="ss-arrow">›</div>
+            </div>
+            <div class="ss-item" onclick="toast('📦 No purchases yet','info')"><div class="ss-icon">🛍️</div><div class="ss-label">My Purchases</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="openModal('locationModal')"><div class="ss-icon">📍</div><div class="ss-label">Change Location</div><div class="ss-arrow">›</div></div>
+            <div class="ss-item" onclick="openModal('inviteModal')"><div class="ss-icon">✉️</div><div class="ss-label">Invite & Earn</div><div class="ss-arrow">›</div></div>
+          </div>
+          <div class="settings-section">
+            <div class="ss-title">Settings</div>
+            <div class="ss-item">
+              <div class="ss-icon">🔔</div><div class="ss-label">Notifications</div>
+              <label class="toggle-sw" style="margin-left:auto">
+                <input type="checkbox" checked id="notifToggle" onchange="toggleNotif(this)">
+                <div class="sw-tr on" id="swTr"><div class="sw-th" style="transform:translateX(20px)" id="swTh"></div></div>
+              </label>
+            </div>
+            <div class="ss-item">
+              <div class="ss-icon">🌐</div><div class="ss-label">Language</div>
+              <select class="form-inp" style="width:auto;padding:5px 10px;font-size:13px;margin-left:auto" onchange="toast('Language updated!','success')">
+                <option>English</option><option>हिंदी</option><option>ಕನ್ನಡ</option><option>मराठी</option>
+              </select>
+            </div>
+            <div class="ss-item" onclick="toast('App version: 4.2.1','info')"><div class="ss-icon">ℹ️</div><div class="ss-label">App Version</div><div style="font-size:13px;color:var(--text3);margin-left:auto">v4.2.1</div></div>
+            <div class="ss-item" onclick="confirmLogout()" style="color:var(--red)"><div class="ss-icon" style="background:var(--redL)">🚪</div><div class="ss-label" style="color:var(--red)">Logout</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- end app-layout -->
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item active" id="mn-home" onclick="showPage('home')"><div class="mn-icon">🏠</div><div class="mn-label">Home</div></div>
+    <div class="mn-item" id="mn-mandi" onclick="showPage('mandi')"><div class="mn-icon">₹</div><div class="mn-label">Mandi</div></div>
+    <div class="mn-item" id="mn-shop" onclick="showPage('shop')"><div class="mn-icon">🛒</div><div class="mn-label">Shop</div></div>
+    <div class="mn-item" id="mn-advisory" onclick="showPage('advisory')"><div class="mn-icon">🌱</div><div class="mn-label">Advisory</div></div>
+    <div class="mn-item" id="mn-more" onclick="showPage('more')"><div class="mn-icon">☰</div><div class="mn-label">More</div><div class="mn-dot"></div></div>
+  </div>
+</div>
+
+<!-- ══ MODALS ═════════════════════════════ -->
+
+<!-- Add Crop Modal -->
+<div class="modal-overlay" id="addCropModal" onclick="if(event.target===this)closeModal('addCropModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('addCropModal')">✕</button>
+    <div class="modal-title">🌾 Manage My Crops</div>
+    <div class="modal-sub">Add or remove crops to get personalized advisory</div>
+    <div id="manageCropsList" style="margin-bottom:16px"></div>
+    <div style="border-top:1px solid var(--border2);padding-top:16px;margin-top:8px">
+      <div style="font-weight:700;font-size:14px;color:var(--text2);margin-bottom:12px">Add New Crop</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-field" style="margin:0"><label>Crop Name</label><input class="form-inp" placeholder="e.g. Tomatoes" id="newCropName"></div>
+        <div class="form-field" style="margin:0"><label>Sowing Date</label><input class="form-inp" type="date" id="newCropDate"></div>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:14px;border-radius:12px;padding:13px" onclick="addCrop()">+ Add Crop</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal" onclick="if(event.target===this)closeModal('editProfileModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('editProfileModal')">✕</button>
+    <div class="modal-title">✏️ Edit Profile</div>
+    <div class="form-field"><label>Full Name</label><input class="form-inp" id="profileName" placeholder="Ramesh Kumar"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field"><label>Mobile</label><input class="form-inp" id="profilePhone" type="tel" placeholder="9876543210"></div>
+      <div class="form-field"><label>State</label>
+        <select class="form-inp" id="profileState">
+          <option>Karnataka</option><option>Maharashtra</option><option>Andhra Pradesh</option><option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option><option>Punjab</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-field"><label>District</label><input class="form-inp" id="profileDistrict" placeholder="Belagavi"></div>
+      <div class="form-field"><label>Farm Size (Acres)</label><input class="form-inp" id="profileFarm" type="number" placeholder="5"></div>
+    </div>
+    <div class="form-field"><label>Main Crops</label><input class="form-inp" id="profileCropsField" placeholder="Corn, Tomato, Wheat"></div>
+    <button class="btn btn-primary btn-block" style="border-radius:12px;padding:14px;font-size:15px" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
+
+<!-- Crop Doctor Modal -->
+<div class="modal-overlay" id="cropDoctorModal" onclick="if(event.target===this)closeModal('cropDoctorModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('cropDoctorModal')">✕</button>
+    <div class="modal-title">🩺 Crop Doctor</div>
+    <div class="modal-sub">Upload a photo of your crop for AI disease diagnosis</div>
+    <div style="border:2px dashed var(--g5);border-radius:var(--r2);padding:28px;text-align:center;cursor:pointer;background:var(--g7);margin-bottom:16px" onclick="simulateDiagnosis()" id="cdUploadArea">
+      <div style="font-size:48px;margin-bottom:10px">📸</div>
+      <div style="font-weight:700;font-size:15px;color:var(--g2)">Tap to Upload Crop Photo</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">JPG, PNG supported · Max 10MB</div>
+    </div>
+    <div id="diagnosisResult" style="display:none;background:var(--redL);border:1px solid #fca5a5;border-radius:var(--r);padding:16px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:15px;color:var(--red);margin-bottom:8px">⚠️ Detected: Early Blight (Alternaria solani)</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        🔴 Severity: <b>Moderate (35% leaf area)</b><br>
+        💊 Treatment: Apply <b>Mancozeb 75% WP @ 2g/L</b><br>
+        ⏰ Best time: Early morning or late evening spray<br>
+        🔁 Repeat: After 10–12 days if needed<br>
+        💰 Recommended: <b>Bayer Infinito / Luna Experience</b>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="showPage('shop');closeModal('cropDoctorModal');toast('🛒 Showing recommended products','success')">Buy Treatment Products →</button>
+    </div>
+    <div style="display:flex;gap:10px">
+      <select class="form-inp" id="cdCropSelect" style="flex:1">
+        <option>Select Crop</option><option>Corn</option><option>Tomato</option><option>Wheat</option><option>Cotton</option><option>Rice</option>
+      </select>
+      <button class="btn btn-primary" onclick="simulateDiagnosis()">Analyse</button>
+    </div>
+  </div>
+</div>
+
+<!-- Verify Modal -->
+<div class="modal-overlay" id="verifyModal" onclick="if(event.target===this)closeModal('verifyModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('verifyModal')">✕</button>
+    <div class="modal-title">🔍 Verify Bayer Product</div>
+    <div class="modal-sub">Scan QR code or enter product code to verify authenticity</div>
+    <div style="text-align:center;background:var(--g7);border-radius:var(--r2);padding:24px;margin-bottom:16px">
+      <div style="font-size:56px;margin-bottom:8px">📷</div>
+      <div style="font-weight:700;font-size:15px;color:var(--g2)">Scan Product QR Code</div>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="simulateVerify()">Open Camera</button>
+    </div>
+    <div style="text-align:center;font-size:13px;color:var(--text3);margin-bottom:12px">— or enter code manually —</div>
+    <div style="display:flex;gap:10px">
+      <input class="form-inp" placeholder="Enter 16-digit product code" id="verifyCodeInp" style="flex:1">
+      <button class="btn btn-primary" onclick="simulateVerify()">Verify</button>
+    </div>
+    <div id="verifyResult" style="display:none;margin-top:14px;background:#e8f5e9;border-radius:var(--r);padding:14px">
+      <div style="color:var(--g2);font-weight:800;font-size:15px;margin-bottom:4px">✅ Authentic Bayer Product</div>
+      <div style="font-size:13px;color:var(--text2)">Product: <b>Bayer Confidor 200 SL</b><br>Batch: BYR2024KA001 · Mfg: Jan 2024 · Exp: Dec 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- Coins Modal -->
+<div class="modal-overlay" id="coinsModal" onclick="if(event.target===this)closeModal('coinsModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('coinsModal')">✕</button>
+    <div style="text-align:center;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--r2);padding:24px;color:#fff;margin-bottom:20px">
+      <div style="font-size:48px;margin-bottom:8px">🏆</div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800" id="modalCoins">0 Coins</div>
+      <div style="font-size:13px;opacity:.85;margin-top:4px">Earn coins, redeem rewards!</div>
+    </div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:12px">How to Earn Coins</div>
+    <div id="coinsEarnList"></div>
+  </div>
+</div>
+
+<!-- Location Modal -->
+<div class="modal-overlay" id="locationModal" onclick="if(event.target===this)closeModal('locationModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('locationModal')">✕</button>
+    <div class="modal-title">📍 Change Location</div>
+    <div class="form-field"><label>State</label>
+      <select class="form-inp"><option selected>Karnataka</option><option>Maharashtra</option><option>AP</option><option>Tamil Nadu</option><option>Telangana</option></select>
+    </div>
+    <div class="form-field"><label>District</label>
+      <select class="form-inp"><option selected>Belagavi</option><option>Dharwad</option><option>Hubli</option><option>Bijapur</option></select>
+    </div>
+    <div class="form-field"><label>Taluk / Village</label><input class="form-inp" placeholder="Enter taluk or village"></div>
+    <button class="btn btn-primary btn-block" style="border-radius:12px;padding:14px" onclick="closeModal('locationModal');toast('📍 Location updated!','success')">Update Location</button>
+    <button class="btn btn-ghost btn-block" style="border-radius:12px;padding:14px;margin-top:8px" onclick="detectLocation()">📍 Auto Detect</button>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal-overlay" id="inviteModal" onclick="if(event.target===this)closeModal('inviteModal')">
+  <div class="modal-box" style="text-align:center">
+    <button class="modal-close" onclick="closeModal('inviteModal')">✕</button>
+    <div style="font-size:56px;margin-bottom:12px">🎁</div>
+    <div class="modal-title">Invite & Earn!</div>
+    <div class="modal-sub">Invite farmer friends and earn 50 Bayer Coins per referral</div>
+    <div style="background:var(--g6);border:2px dashed var(--border);border-radius:var(--r2);padding:18px;margin-bottom:16px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:5px">Your Referral Code</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--g1);letter-spacing:3px">FARM2024</div>
+    </div>
+    <button class="btn btn-primary btn-lg btn-block" onclick="toast('📤 Invite link copied!','success')">📤 Copy Invite Link</button>
+    <button class="btn btn-ghost btn-block" style="margin-top:10px;border-radius:60px" onclick="toast('📱 Opening WhatsApp...')">📱 Share on WhatsApp</button>
+  </div>
+</div>
+
+<!-- Product Detail Modal -->
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeModal('productModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('productModal')">✕</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="productModalContent"></div>
+  </div>
+</div>
+
+<!-- Mandi History Modal -->
+<div class="modal-overlay" id="mandiHistoryModal" onclick="if(event.target===this)closeModal('mandiHistoryModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mandiHistoryModal')">✕</button>
+    <div class="modal-title" id="mandiHistoryTitle">Price History</div>
+    <canvas id="historyChart" height="160" style="margin-top:16px"></canvas>
+    <div id="mandiHistoryStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal-overlay" id="otpModal" onclick="if(event.target===this)closeModal('otpModal')">
+  <div class="modal-box" style="max-width:400px">
+    <button class="modal-close" onclick="closeModal('otpModal')">✕</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:48px;margin-bottom:10px">📱</div>
+      <div class="modal-title" style="text-align:center">Verify Your Phone</div>
+      <div class="modal-sub" style="text-align:center" id="otpSubtext">OTP sent to your number</div>
+    </div>
+    <div class="form-field"><label>Enter OTP</label>
+      <input class="form-inp" type="number" placeholder="Enter 6-digit OTP" id="otpInput" maxlength="6" style="text-align:center;letter-spacing:8px;font-size:20px;font-weight:700">
+    </div>
+    <button class="btn btn-primary btn-block" style="border-radius:12px;padding:14px;font-size:15px" onclick="verifyOTP()">Verify & Connect</button>
+    <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--text3)">Didn't receive? <span style="color:var(--g2);font-weight:600;cursor:pointer" onclick="toast('OTP resent!','success')">Resend OTP</span></div>
+  </div>
+</div>
+
+<!-- ══ JAVASCRIPT ═════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════
+//  DATA STORE
+// ══════════════════════════════════════════
+const DB = {
+  get: k => { try{return JSON.parse(localStorage.getItem('fr_'+k))}catch{return null} },
+  set: (k,v) => localStorage.setItem('fr_'+k, JSON.stringify(v))
+};
+
+// ── MANDI DATA ─────────────────────────────
+const CROPS = [
+  {id:'corn',emoji:'🌽',label:'Corn',varieties:['CORN','SWEET CORN','WHITE CORN','MAIZE']},
+  {id:'tomato',emoji:'🍅',label:'Tomato',varieties:['TOMATO','CHERRY TOMATO']},
+  {id:'onion',emoji:'🧅',label:'Onion',varieties:['ONION RED','ONION WHITE','SMALL ONION']},
+  {id:'wheat',emoji:'🌾',label:'Wheat',varieties:['WHEAT','LOKWAN','SHARBATI']},
+  {id:'capsicum',emoji:'🫑',label:'Capsicum',varieties:['CAPSICUM','BELL PEPPER']},
+  {id:'soybean',emoji:'🫘',label:'Soybean',varieties:['SOYBEAN','SOY SEEDS']},
+  {id:'cumin',emoji:'🌿',label:'Cumin',varieties:['CUMIN','JEERA']},
+  {id:'rice',emoji:'🍚',label:'Rice',varieties:['RICE','BASMATI','SONA MASOORI']},
+];
+
+const MANDI_PRICES = {
+  corn:[
+    {name:'BELGAUM',dist:12,lo:1320,hi:1520,trend:'up',delta:'+₹48',date:'15 Mar',highlight:false},
+    {name:'HUBLI',dist:78,lo:1311,hi:1611,trend:'dn',delta:'-₹32',date:'15 Mar',highlight:false},
+    {name:'DHARWAD',dist:45,lo:1280,hi:1450,trend:'dn',delta:'-₹20',date:'15 Mar',highlight:false},
+    {name:'SANGLI',dist:116,lo:1850,hi:1950,trend:'up',delta:'+₹95',date:'14 Mar',highlight:true},
+    {name:'LAKSHMESHWAR',dist:134,lo:1418,hi:1576,trend:'up',delta:'+₹28',date:'15 Mar',highlight:false},
+    {name:'GULBARGA',dist:220,lo:1400,hi:1600,trend:'up',delta:'+₹60',date:'13 Mar',highlight:false},
+  ],
+  tomato:[
+    {name:'BELGAUM',dist:12,lo:750,hi:1100,trend:'dn',delta:'-₹80',date:'15 Mar',highlight:false},
+    {name:'HUBLI',dist:78,lo:800,hi:1200,trend:'up',delta:'+₹120',date:'15 Mar',highlight:true},
+    {name:'PUNE',dist:310,lo:1100,hi:1400,trend:'up',delta:'+₹200',date:'14 Mar',highlight:false},
+    {name:'NASHIK',dist:420,lo:950,hi:1250,trend:'up',delta:'+₹150',date:'14 Mar',highlight:false},
+  ],
+  onion:[
+    {name:'NASHIK',dist:420,lo:1800,hi:2200,trend:'up',delta:'+₹300',date:'15 Mar',highlight:true},
+    {name:'BELGAUM',dist:12,lo:1200,hi:1500,trend:'dn',delta:'-₹100',date:'15 Mar',highlight:false},
+    {name:'SOLAPUR',dist:280,lo:1600,hi:1900,trend:'up',delta:'+₹200',date:'14 Mar',highlight:false},
+  ],
+  wheat:[
+    {name:'BELGAUM',dist:12,lo:2100,hi:2300,trend:'up',delta:'+₹50',date:'15 Mar',highlight:false},
+    {name:'HUBLI',dist:78,lo:2050,hi:2250,trend:'dn',delta:'-₹30',date:'15 Mar',highlight:false},
+    {name:'PUNE',dist:310,lo:2200,hi:2400,trend:'up',delta:'+₹80',date:'14 Mar',highlight:true},
+  ],
+  capsicum:[
+    {name:'BELGAUM',dist:12,lo:2500,hi:3200,trend:'up',delta:'+₹400',date:'15 Mar',highlight:true},
+    {name:'BANGALORE',dist:450,lo:3000,hi:3800,trend:'up',delta:'+₹500',date:'15 Mar',highlight:false},
+  ],
+};
+
+const PRICE_HISTORY = {
+  corn:[1420,1380,1450,1510,1480,1520,1580],
+  tomato:[900,850,980,1020,1100,1050,1150],
+  onion:[1500,1600,1700,1800,1750,1850,2000],
+  wheat:[2100,2050,2150,2200,2180,2250,2280],
+};
+
+// ── PRODUCTS ───────────────────────────────
+const PRODUCTS = [
+  {id:'p1',name:'DKC 9081 Corn Hybrid Seeds',brand:'Bayer Seeds',emoji:'🌽',cat:'Seeds',price:1850,mrp:2200,discount:16,rating:4.5,reviews:234,unit:'Per bag',inCart:false,wishlist:false},
+  {id:'p2',name:'Confidor 200 SL Insecticide',brand:'Bayer CropScience',emoji:'🧴',cat:'Pesticides',price:485,mrp:550,discount:12,rating:4.7,reviews:189,unit:'100ml',inCart:false,wishlist:false},
+  {id:'p3',name:'Urea Fertilizer 50 kg Bag',brand:'IFFCO',emoji:'💊',cat:'Fertilizers',price:280,mrp:320,discount:13,rating:4.3,reviews:456,unit:'50 kg',inCart:false,wishlist:false},
+  {id:'p4',name:'Knapsack Sprayer 16L',brand:'Neptune',emoji:'🪣',cat:'Equipment',price:1299,mrp:1800,discount:28,rating:4.4,reviews:312,unit:'1 unit',inCart:false,wishlist:false},
+  {id:'p5',name:'Luna Experience 400 SC',brand:'Bayer CropScience',emoji:'🔬',cat:'Pesticides',price:640,mrp:720,discount:11,rating:4.6,reviews:142,unit:'250ml',inCart:false,wishlist:false},
+  {id:'p6',name:'DAP Fertilizer 50 kg',brand:'IFFCO',emoji:'🌿',cat:'Fertilizers',price:1350,mrp:1450,discount:7,rating:4.5,reviews:678,unit:'50 kg',inCart:false,wishlist:false},
+  {id:'p7',name:'Tomato Hybrid Seeds F1',brand:'Syngenta',emoji:'🍅',cat:'Seeds',price:380,mrp:450,discount:16,rating:4.2,reviews:98,unit:'10g packet',inCart:false,wishlist:false},
+  {id:'p8',name:'Drip Irrigation Kit',brand:'Jain Irrigation',emoji:'💧',cat:'Equipment',price:4500,mrp:6000,discount:25,rating:4.6,reviews:234,unit:'1 acre kit',inCart:false,wishlist:false},
+  {id:'p9',name:'Infinito 687.5 SC',brand:'Bayer CropScience',emoji:'🧪',cat:'Pesticides',price:820,mrp:950,discount:14,rating:4.8,reviews:167,unit:'500ml',inCart:false,wishlist:false},
+  {id:'p10',name:'NPK 19-19-19 5kg',brand:'Coromandel',emoji:'🌱',cat:'Fertilizers',price:520,mrp:600,discount:13,rating:4.4,reviews:345,unit:'5 kg',inCart:false,wishlist:false},
+  {id:'p11',name:'Cotton BG-II Hybrid Seeds',brand:'Bioseed',emoji:'🤍',cat:'Seeds',price:730,mrp:830,discount:12,rating:4.3,reviews:212,unit:'450g packet',inCart:false,wishlist:false},
+  {id:'p12',name:'Soil pH Testing Kit',brand:'AgriTest',emoji:'🔭',cat:'Equipment',price:350,mrp:500,discount:30,rating:4.1,reviews:88,unit:'1 kit',inCart:false,wishlist:false},
+];
+
+// ── RETAILERS ─────────────────────────────
+const RETAILERS = [
+  {name:'Shri Agro Inputs',dist:'2.3 km',emoji:'🏪',rating:4.5,tags:['Seeds','Pesticides','Fertilizers'],phone:'9876543210'},
+  {name:'Farmer Friend Store',dist:'4.1 km',emoji:'🌾',rating:4.3,tags:['Bayer Products','Tools'],phone:'9876543211'},
+  {name:'Agri World Belagavi',dist:'6.8 km',emoji:'🛒',rating:4.6,tags:['All Products','Delivery'],phone:'9876543212'},
+  {name:'Karnataka Seeds House',dist:'8.2 km',emoji:'🌱',rating:4.7,tags:['Seeds','Hybrid Varieties'],phone:'9876543213'},
+  {name:'Green Gold Agro',dist:'11.5 km',emoji:'💚',rating:4.2,tags:['Organic Products','Fertilizers'],phone:'9876543214'},
+  {name:'Belgaum Krishi Kendra',dist:'13.1 km',emoji:'🏬',rating:4.8,tags:['Complete Store','Credit Available'],phone:'9876543215'},
+];
+
+// ── SCHEMES ───────────────────────────────
+const SCHEMES = [
+  {icon:'🌾',title:'PM-KISAN',desc:'₹6,000/year direct benefit. 3 installments of ₹2,000. No middleman.',tag:'Central',btn:'Apply Now'},
+  {icon:'☔',title:'PM Fasal Bima Yojana',desc:'Crop insurance against natural calamities, pests & diseases. Low premium.',tag:'Insurance',btn:'Enroll'},
+  {icon:'💧',title:'PM Krishi Sinchai Yojana',desc:'Micro irrigation — drip & sprinkler with 55% subsidy for farmers.',tag:'Irrigation',btn:'Check Eligibility'},
+  {icon:'🏦',title:'Kisan Credit Card',desc:'Short-term credit at 4% interest for crop cultivation and allied activities.',tag:'Credit',btn:'Apply'},
+  {icon:'🌱',title:'Soil Health Card',desc:'Free soil testing + health card with crop-wise nutrient recommendations.',tag:'Soil',btn:'Get Card'},
+  {icon:'☀️',title:'PM Kusum Scheme',desc:'Solar pump installation with 60-90% subsidy for rural farmers.',tag:'Energy',btn:'Apply'},
+  {icon:'📦',title:'e-NAM Platform',desc:'Online national agriculture marketplace. Sell directly to buyers across India.',tag:'Market',btn:'Register'},
+  {icon:'🎓',title:'Kisan Suvidha App',desc:'Free advisory, market prices, dealers info. Download for offline use.',tag:'Digital',btn:'Download'},
+];
+
+// ── NEWS ──────────────────────────────────
+const NEWS = [
+  {emoji:'📈',tag:'Market',title:'Corn prices expected to rise 15% due to increased export demand from Southeast Asia',date:'15 Mar 2026',cat:'Market'},
+  {emoji:'💧',tag:'Weather',title:'IMD predicts normal monsoon 2026 in Karnataka — farmers advised to prepare fields',date:'14 Mar 2026',cat:'Weather'},
+  {emoji:'🏛️',tag:'Government',title:'PM-KISAN 17th installment of ₹2000 released — check your payment status now',date:'13 Mar 2026',cat:'Government'},
+  {emoji:'🐛',tag:'Alert',title:'Fall Armyworm outbreak in Dharwad, Belagavi — emergency spray advisory issued',date:'12 Mar 2026',cat:'Alert'},
+  {emoji:'🌡️',tag:'Weather',title:'Heatwave alert for North Karnataka next week — protect crops with proper irrigation',date:'11 Mar 2026',cat:'Weather'},
+  {emoji:'💰',tag:'Market',title:'Onion prices surge 40% in APMC mandis — good window to sell in coming 2 weeks',date:'10 Mar 2026',cat:'Market'},
+];
+
+// ── VIDEOS ────────────────────────────────
+const VIDEOS = [
+  {emoji:'🌾',title:'Balanced Plant Nutrition for Better Crop Yield',channel:'Bayer CropScience India',views:'1.2M',cat:'Nutrition'},
+  {emoji:'🍌',title:'Red Banana Farming — Complete Guide 2026',channel:'Discovery Agriculture',views:'890K',cat:'Farming'},
+  {emoji:'🌽',title:'Corn Hybrid Selection — Expert Tips for Kharif',channel:'Bayer Seeds',views:'450K',cat:'Seeds'},
+  {emoji:'🍅',title:'Tomato Disease Management with Bayer Products',channel:'Agri Expert India',views:'320K',cat:'Disease'},
+  {emoji:'🐛',title:'Integrated Pest Management — Reduce Chemicals 60%',channel:'Bayer CropScience',views:'280K',cat:'Pest'},
+  {emoji:'💧',title:'Drip Irrigation — Save Water, Get More Yield',channel:'Farm Tech India',views:'560K',cat:'Irrigation'},
+  {emoji:'🌦️',title:'Weather-based Crop Planning for Karnataka Farmers',channel:'IMD AgriAdvisory',views:'190K',cat:'Weather'},
+  {emoji:'🧪',title:'Understanding NPK Fertilizers — When & How Much',channel:'IFFCO Kisan',views:'740K',cat:'Nutrition'},
+  {emoji:'🌱',title:'Organic Farming Basics — Zero Budget Natural Farming',channel:'Green Farm India',views:'420K',cat:'Organic'},
+  {emoji:'⚙️',title:'Knapsack Sprayer Maintenance Guide',channel:'Farm Equipment TV',views:'135K',cat:'Equipment'},
+];
+
+// ── NOTIFICATIONS ─────────────────────────
+const NOTIFS = DB.get('notifs') || [
+  {id:'n1',icon:'📈',cls:'amber',title:'Mandi Alert!',body:'Corn prices at HUBLI rose 8% today (₹1611/100kg). Consider selling now.',time:'Just now',read:false},
+  {id:'n2',icon:'🐛',cls:'red',title:'Pest Alert — Belagavi',body:'Fall Armyworm outbreak near your location. Spray Coragen immediately.',time:'2 hrs ago',read:false},
+  {id:'n3',icon:'🌧️',cls:'blue',title:'Weather Warning',body:'Light rain expected Tuesday morning. Delay spraying schedule.',time:'4 hrs ago',read:true},
+  {id:'n4',icon:'🏛️',cls:'green',title:'PM-KISAN Credit',body:'₹2000 has been credited to your Aadhaar-linked bank account.',time:'Yesterday',read:true},
+  {id:'n5',icon:'🤖',cls:'green',title:'AI Advisory',body:'Based on your Corn crop stage (V6), apply second dose of Urea this week.',time:'Yesterday',read:true},
+  {id:'n6',icon:'⭐',cls:'amber',title:'Review Request',body:'Rate your recent purchase of Confidor 200 SL from Shri Agro Inputs.',time:'2 days ago',read:true},
+];
+
+// ── AI RECS ────────────────────────────────
+const AI_RECS = [
+  {emoji:'🌽',name:'Corn',reason:'High metro demand + export season. Prices rising.',price:'₹48–52/kg',conf:92},
+  {emoji:'🌶️',name:'Red Chilli',reason:'Export season starting. Prices at 2-year high.',price:'₹190–210/kg',conf:87},
+  {emoji:'🧅',name:'Onions',reason:'Post-rain shortage expected. Stock up now.',price:'₹38–42/kg',conf:78},
+];
+
+// ── PEST ALERTS ────────────────────────────
+const PEST_ALERTS = [
+  {emoji:'🐛',level:'High',name:'Fall Armyworm',crop:'Corn',area:'Belagavi, Dharwad',action:'Spray Coragen 18.5 SC @ 150ml/acre',cls:'pa-high'},
+  {emoji:'🦟',level:'Medium',name:'Whitefly',crop:'Tomato, Chilli',area:'All districts',action:'Yellow sticky traps + Imidacloprid spray',cls:'pa-med'},
+  {emoji:'🍄',level:'Low',name:'Powdery Mildew',crop:'Grapes, Cucurbits',area:'Bijapur, Bagalkot',action:'Hexaconazole 5 EC @ 2ml/L',cls:'pa-low'},
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let state = {
+  activeCrop: 'corn',
+  activeVariety: 0,
+  sortMode: 'dist',
+  mandiFollowed: DB.get('followed') || {},
+  cart: DB.get('cart') || [],
+  wishlist: DB.get('wishlist') || [],
+  coins: DB.get('coins') || 0,
+  myCrops: DB.get('myCrops') || [{name:'Corn',emoji:'🌽',sowDate:'2026-06-15'}],
+  profile: DB.get('profile') || {name:'',phone:'',state:'Karnataka',district:'Belagavi'},
+  shopFilter: 'All',
+  priceChart: null,
+  mandiChart: null,
+  historyChart: null,
+  flashTime: 2*3600+34*60+18,
+};
+
+// ══════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ══════════════════════════════════════════
+
+function renderAll(){
+  renderQuickGrid();
+  renderMarketOverview();
+  renderHomeProducts();
+  renderHomeNews();
+  renderMandiPage();
+  renderShopPage();
+  renderAdvisoryPage();
+  renderVideosPage();
+  renderSchemes();
+  renderRetailers();
+  renderNewsPage();
+  renderNotifPanel();
+  buildPriceChart();
+  buildMandiChart();
+  renderProfileData();
+  animateCounters();
+  startFlashTimer();
+}
+
+// ── HOME ──────────────────────────────────
+function renderQuickGrid(){
+  const actions = [
+    {emoji:'📊',label:'Mandi Prices',fn:"showPage('mandi')"},
+    {emoji:'🛒',label:'Shop Now',fn:"showPage('shop')"},
+    {emoji:'🩺',label:'Crop Doctor',fn:'showCropDoctorModal()'},
+    {emoji:'🏛️',label:'Govt Schemes',fn:"showPage('schemes')"},
+    {emoji:'🏪',label:'Nearby Retailers',fn:"showPage('retailers')"},
+    {emoji:'📰',label:'Agri News',fn:"showPage('news')"},
+    {emoji:'🔍',label:'Verify Product',fn:"openModal('verifyModal')"},
+    {emoji:'🤖',label:'AI Advisory',fn:"showPage('advisory')"},
+    {emoji:'💰',label:'Earn Coins',fn:"openModal('coinsModal')"},
+  ];
+  const g = document.getElementById('quickGrid');
+  g.innerHTML = actions.map(a=>`
+    <div class="qa-card" onclick="${a.fn}">
+      <span class="qac-icon">${a.emoji}</span>
+      <div class="qac-label">${a.label}</div>
+    </div>`).join('');
+}
+
+function renderMarketOverview(){
+  const crops = ['corn','tomato','onion','wheat'];
+  const wrap = document.getElementById('marketOverview');
+  wrap.innerHTML = crops.map(c => {
+    const crop = CROPS.find(x=>x.id===c);
+    const prices = MANDI_PRICES[c]||[];
+    if(!prices.length) return '';
+    const best = prices.reduce((a,b)=>b.hi>a.hi?b:a, prices[0]);
+    const isUp = best.trend === 'up';
+    return `<div class="mo-card" onclick="showPage('mandi');setActiveCrop('${c}')">
+      <div class="moc-crop"><div class="moc-emoji">${crop.emoji}</div><div class="moc-name">${crop.label}</div></div>
+      <div class="moc-price">₹${best.hi.toLocaleString('en-IN')}</div>
+      <div class="moc-unit">per 100 kg · ${best.name}</div>
+      <div class="moc-trend ${isUp?'trend-up':'trend-dn'}">${isUp?'▲':'▼'} ${best.delta} today</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHomeProducts(){
+  const p = document.getElementById('homeProducts');
+  p.innerHTML = PRODUCTS.slice(0,6).map(prod=>makeProdCard(prod)).join('');
+}
+
+function renderHomeNews(){
+  const wrap = document.getElementById('homeNews');
+  wrap.innerHTML = NEWS.slice(0,3).map(n=>`
+    <div class="news-card" onclick="toast('📰 Opening article...','info')">
+      <div class="nc-img">${n.emoji}</div>
+      <div class="nc-body">
+        <div class="nc-tag"><span class="badge badge-green">${n.tag}</span></div>
+        <div class="nc-title">${n.title}</div>
+        <div class="nc-meta"><div class="nc-date">${n.date}</div><div class="nc-read">Read →</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function animateCounters(){
+  [{id:'hc1',v:240},{id:'hc2',v:500},{id:'hc4',v:8}].forEach(({id,v})=>{
+    let cur=0;const el=document.getElementById(id);if(!el)return;
+    const t=setInterval(()=>{cur=Math.min(cur+v/60,v);el.textContent=Math.floor(cur)+(cur>=v?'+':'');if(cur>=v)clearInterval(t);},20);
+  });
+}
+
+// ── MANDI ─────────────────────────────────
+function renderMandiPage(){
+  renderMandiCropRow();
+  renderVarietyTabs();
+  filterMandi();
+}
+
+function renderMandiCropRow(){
+  const wrap = document.getElementById('mandiCropRow');
+  wrap.innerHTML = CROPS.map(c=>`
+    <div class="cfr-item ${c.id===state.activeCrop?'active':''}" onclick="setActiveCrop('${c.id}')">
+      <div class="cfr-circle">${c.emoji}</div>
+      <div class="cfr-label">${c.label}</div>
+    </div>`).join('') +
+    `<div class="cfr-item" onclick="toast('Add/remove crops feature','info')">
+      <div class="cfr-circle" style="background:var(--g2);border-color:var(--g2);color:#fff">+</div>
+      <div class="cfr-label">Add Crop</div>
+    </div>`;
+}
+
+function setActiveCrop(id){
+  state.activeCrop = id;
+  state.activeVariety = 0;
+  renderMandiCropRow();
+  renderVarietyTabs();
+  filterMandi();
+  updateMandiChart();
+  const crop = CROPS.find(c=>c.id===id);
+  if(document.getElementById('mandiChartTitle'))
+    document.getElementById('mandiChartTitle').textContent = `${crop.emoji} ${crop.label} — Price History (7 days)`;
+}
+
+function renderVarietyTabs(){
+  const crop = CROPS.find(c=>c.id===state.activeCrop);
+  const wrap = document.getElementById('varietyTabsRow');
+  if(!wrap) return;
+  wrap.innerHTML = (crop?.varieties||[]).map((v,i)=>`
+    <button onclick="state.activeVariety=${i};renderVarietyTabs();filterMandi()"
+      style="padding:7px 16px;border-radius:50px;border:1.5px solid ${i===state.activeVariety?'var(--g2)':'var(--border2)'};
+      background:${i===state.activeVariety?'var(--g2)':'#fff'};color:${i===state.activeVariety?'#fff':'var(--text2)'};
+      font-size:13px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap">${v}</button>`).join('');
+}
+
+function filterMandi(){
+  const search = (document.getElementById('mandiSearch')?.value||'').toLowerCase();
+  const radius = parseInt(document.getElementById('mandiRadius')?.value||9999);
+  const highOnly = document.getElementById('showHighOnly')?.checked;
+  let data = MANDI_PRICES[state.activeCrop]||[];
+  if(search) data = data.filter(m=>m.name.toLowerCase().includes(search));
+  if(radius<9999) data = data.filter(m=>m.dist<=radius);
+  if(highOnly) data = data.filter(m=>m.highlight);
+  data = sortMandiData(data, state.sortMode);
+  document.getElementById('mandiResultCount').textContent = data.length;
+  const grid = document.getElementById('mandiGrid');
+  if(!grid) return;
+  grid.innerHTML = data.length ? data.map(m=>makeMandiCard(m)).join('') : `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px;opacity:.4">🔍</div><div>No mandis found. Try changing filters.</div></div>`;
+}
+
+function makeMandiCard(m){
+  const isUp = m.trend==='up';
+  const crop = CROPS.find(c=>c.id===state.activeCrop);
+  const fill = Math.round(((m.lo/2500)*100));
+  const fol = state.mandiFollowed[m.name];
+  return `<div class="mandi-card" style="margin-top:${m.highlight?'14px':'0'}">
+    ${m.highlight?`<div class="mc-highest-tag">📈 Highest in 15 days</div>`:''}
+    <div class="mc-top">
+      <div class="mc-left">
+        <div class="mc-name">${m.name}</div>
+        <div class="mc-dist"><i class="fas fa-map-marker-alt" style="color:var(--g3)"></i> ${m.dist} km</div>
+      </div>
+      <div class="mc-price-wrap">
+        <div class="mc-price">₹${m.lo.toLocaleString('en-IN')} – ₹${m.hi.toLocaleString('en-IN')} <span class="${isUp?'mc-trend-up':'mc-trend-dn'}">${isUp?'▲':'▼'}</span></div>
+        <div class="mc-date">${m.date} · 100 kg</div>
+        <div style="font-size:11px;font-weight:700;${isUp?'color:var(--g2)':'color:var(--red)'}">${m.delta} today</div>
+      </div>
+    </div>
+    <div class="mc-bar"><div class="mc-bar-fill" style="width:${fill}%"></div></div>
+    <div class="mc-bottom">
+      <button class="mc-follow ${fol?'followed':''}" onclick="toggleMandiFollow('${m.name}',this)">${fol?'✓ Following':'+ Follow'}</button>
+      <div class="mc-prev" onclick="showMandiHistory('${m.name}','${state.activeCrop}')">Previous prices ›</div>
+    </div>
+  </div>`;
+}
+
+function sortMandiData(data,mode){
+  if(mode==='dist') return [...data].sort((a,b)=>a.dist-b.dist);
+  if(mode==='price') return [...data].sort((a,b)=>b.hi-a.hi);
+  if(mode==='trend') return [...data].sort((a,b)=>a.trend==='dn'?1:-1);
+  return data;
+}
+
+function sortMandi(mode,btn){
+  state.sortMode = mode;
+  document.querySelectorAll('.mf-sort-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterMandi();
+}
+
+function toggleMandiFollow(name,btn){
+  state.mandiFollowed[name] = !state.mandiFollowed[name];
+  DB.set('followed',state.mandiFollowed);
+  if(state.mandiFollowed[name]){
+    btn.textContent='✓ Following';btn.classList.add('followed');
+    addNotif('📊','amber',`Following ${name}`,`You'll get price alerts for ${name} mandi.`);
+    toast(`✅ Following ${name} mandi prices!`,'success');
+  } else {
+    btn.textContent='+ Follow';btn.classList.remove('followed');
+    toast(`Unfollowed ${name}`,'info');
+  }
+}
+
+function showMandiHistory(mandiName, cropId){
+  const crop = CROPS.find(c=>c.id===cropId);
+  document.getElementById('mandiHistoryTitle').textContent = `${crop?.emoji||''} ${mandiName} — 15-Day Price History`;
+  const data = PRICE_HISTORY[cropId]||[];
+  const labels = ['9 Mar','10 Mar','11 Mar','12 Mar','13 Mar','14 Mar','15 Mar'];
+  if(state.historyChart) state.historyChart.destroy();
+  openModal('mandiHistoryModal');
+  setTimeout(()=>{
+    const ctx = document.getElementById('historyChart');
+    if(!ctx) return;
+    state.historyChart = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Price (₹/100kg)',data,borderColor:'var(--g2)',backgroundColor:'rgba(28,138,60,.08)',tension:.4,fill:true,borderWidth:2.5,pointBackgroundColor:'var(--g2)',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+    const max=Math.max(...data),min=Math.min(...data);
+    document.getElementById('mandiHistoryStats').innerHTML = [
+      {l:'7-Day High',v:'₹'+max.toLocaleString('en-IN'),c:'var(--g2)'},
+      {l:'7-Day Low',v:'₹'+min.toLocaleString('en-IN'),c:'var(--red)'},
+      {l:'Avg Price',v:'₹'+(Math.round(data.reduce((a,b)=>a+b,0)/data.length)).toLocaleString('en-IN'),c:'var(--amber)'},
+    ].map(s=>`<div style="background:var(--bg3);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:4px">${s.l}</div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:${s.c}">${s.v}</div></div>`).join('');
+  },200);
+}
+
+// ── CHARTS ────────────────────────────────
+function buildPriceChart(){
+  const ctx = document.getElementById('priceChart');
+  if(!ctx) return;
+  const data = PRICE_HISTORY.corn;
+  const labels = ['9 Mar','10 Mar','11 Mar','12 Mar','13 Mar','14 Mar','15 Mar'];
+  if(state.priceChart) state.priceChart.destroy();
+  state.priceChart = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Price',data,borderColor:'#1c8a3c',backgroundColor:'rgba(28,138,60,.07)',tension:.4,fill:true,borderWidth:2.5,pointBackgroundColor:'#1c8a3c',pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
+}
+
+function updateChart(crop){
+  if(!state.priceChart) return;
+  state.priceChart.data.datasets[0].data = PRICE_HISTORY[crop]||PRICE_HISTORY.corn;
+  state.priceChart.update();
+}
+
+function buildMandiChart(){
+  const ctx = document.getElementById('mandiChart');
+  if(!ctx) return;
+  if(state.mandiChart) state.mandiChart.destroy();
+  const data = PRICE_HISTORY[state.activeCrop]||PRICE_HISTORY.corn;
+  const labels = ['9 Mar','10 Mar','11 Mar','12 Mar','13 Mar','14 Mar','15 Mar'];
+  state.mandiChart = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Price (₹/100kg)',data,backgroundColor:data.map((v,i)=>i===data.length-1?'var(--g2)':'rgba(28,138,60,.2)'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}});
+}
+
+function updateMandiChart(){
+  if(!state.mandiChart) return;
+  const data = PRICE_HISTORY[state.activeCrop]||PRICE_HISTORY.corn;
+  state.mandiChart.data.datasets[0].data = data;
+  state.mandiChart.data.datasets[0].backgroundColor = data.map((v,i)=>i===data.length-1?'var(--g2)':'rgba(28,138,60,.2)');
+  state.mandiChart.update();
+}
+
+// ── SHOP ──────────────────────────────────
+function renderShopPage(){
+  const cats = ['All','Seeds','Pesticides','Fertilizers','Equipment'];
+  const wrap = document.getElementById('shopCatScroll');
+  if(!wrap) return;
+  wrap.innerHTML = cats.map((c,i)=>`<div class="cat-chip ${i===0?'active':''}" onclick="filterShop('${c}',this)">${c}</div>`).join('');
+  filterShop('All');
+}
+
+function filterShop(cat, btn){
+  state.shopFilter = cat;
+  if(btn){
+    document.querySelectorAll('#shopCatScroll .cat-chip').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const products = cat==='All' ? PRODUCTS : PRODUCTS.filter(p=>p.cat===cat);
+  const grid = document.getElementById('shopGrid');
+  if(!grid) return;
+  grid.innerHTML = products.map(p=>makeProdCard(p)).join('');
+  const title = document.getElementById('shopSectionTitle');
+  if(title) title.textContent = cat==='All' ? 'All Products' : cat;
+  const cnt = document.getElementById('shopCount');
+  if(cnt) cnt.textContent = products.length+' products';
+}
+
+function makeProdCard(p){
+  const inCart = state.cart.find(c=>c.id===p.id);
+  const inWish = state.wishlist.includes(p.id);
+  return `<div class="prod-card" onclick="showProductDetail('${p.id}')">
+    <div class="pc-img">
+      ${p.emoji}
+      <div class="pc-discount">-${p.discount}%</div>
+      <div class="pc-wishlist" onclick="event.stopPropagation();toggleWishlist('${p.id}',this)">${inWish?'❤️':'🤍'}</div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-brand">${p.brand}</div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-stars">
+        ${'⭐'.repeat(Math.round(p.rating))} <span class="pc-stars-count">(${p.reviews})</span>
+      </div>
+      <div class="pc-price-row">
+        <div class="pc-price">₹${p.price.toLocaleString('en-IN')}</div>
+        <div class="pc-mrp">₹${p.mrp.toLocaleString('en-IN')}</div>
+        <div class="pc-off">${p.discount}% off</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">${p.unit}</div>
+      <button class="pc-add ${inCart?'in-cart':''}" onclick="event.stopPropagation();addToCart('${p.id}',this)">
+        ${inCart?'✓ In Cart':'🛒 Add to Cart'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function showProductDetail(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('productModalContent').innerHTML = `
+    <div style="background:var(--g7);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:100px;aspect-ratio:1">${p.emoji}</div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${p.brand}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.3">${p.name}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--g1)">₹${p.price.toLocaleString('en-IN')}</div>
+        <div style="font-size:14px;color:var(--text4);text-decoration:line-through">₹${p.mrp.toLocaleString('en-IN')}</div>
+        <div class="badge badge-red">${p.discount}% OFF</div>
+      </div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Unit: ${p.unit} · Category: ${p.cat}</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">Premium quality ${p.name.toLowerCase()} from ${p.brand}. Trusted by thousands of farmers across India. ${p.reviews} verified reviews.</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-primary btn-lg" style="flex:1;border-radius:12px" onclick="addToCart('${p.id}');closeModal('productModal')">🛒 Add to Cart</button>
+        <button class="btn btn-ghost" style="border-radius:12px" onclick="toggleWishlist('${p.id}');closeModal('productModal')">🤍</button>
+      </div>
+      <div style="font-size:12px;color:var(--g2);font-weight:600">✅ Free delivery above ₹499 · 💳 Easy EMI available</div>
+    </div>`;
+  openModal('productModal');
+}
+
+// ── CART ──────────────────────────────────
+function addToCart(id, btn){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  const ex = state.cart.find(c=>c.id===id);
+  if(ex) ex.qty = (ex.qty||1)+1;
+  else state.cart.push({...p,qty:1});
+  DB.set('cart',state.cart);
+  updateCartBadge();
+  renderCartSidebar();
+  toast(`🛒 ${p.name} added to cart!`,'success');
+  addNotif('🛒','green','Added to Cart',`${p.name} added successfully.`);
+  if(btn){btn.textContent='✓ In Cart';btn.classList.add('in-cart');}
+  state.coins += 10;
+  DB.set('coins',state.coins);
+  document.getElementById('coinsDisplay').textContent = state.coins;
+}
+
+function updateCartBadge(){
+  const total = state.cart.reduce((s,c)=>s+(c.qty||1),0);
+  const badge = document.getElementById('cartBadge');
+  if(badge){badge.textContent=total;badge.style.display=total?'flex':'none';}
+}
+
+function openCart(){document.getElementById('cartSidebar').classList.add('open');document.getElementById('cartOverlay').classList.add('show');renderCartSidebar();}
+function closeCart(){document.getElementById('cartSidebar').classList.remove('open');document.getElementById('cartOverlay').classList.remove('show');}
+
+function renderCartSidebar(){
+  const items = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  if(!state.cart.length){
+    items.innerHTML=`<div class="cart-empty"><div style="font-size:64px;opacity:.3;margin-bottom:14px">🛒</div><div style="font-weight:700;font-size:16px;color:var(--text2);margin-bottom:6px">Cart is empty</div><div style="font-size:13px;color:var(--text3)">Add products from the Shop</div><button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="closeCart();showPage('shop')">Browse Products</button></div>`;
+    footer.innerHTML='';return;
+  }
+  const subtotal = state.cart.reduce((s,c)=>s+c.price*(c.qty||1),0);
+  const delivery = subtotal>499?0:49;
+  items.innerHTML = state.cart.map((c,i)=>`
+    <div class="cart-item">
+      <div class="ci-img">${c.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${c.name}</div>
+        <div class="ci-sub">${c.brand} · ${c.unit}</div>
+        <div class="ci-ctrl">
+          <button class="ci-ctrl-btn" onclick="cartQty(${i},-1)">−</button>
+          <div class="ci-qty">${c.qty||1}</div>
+          <button class="ci-ctrl-btn" onclick="cartQty(${i},1)">+</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="ci-price">₹${(c.price*(c.qty||1)).toLocaleString('en-IN')}</div>
+        <button class="ci-del" onclick="cartRemove(${i})"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>`).join('');
+  footer.innerHTML=`
+    <div class="cf-row"><span>Subtotal</span><span>₹${subtotal.toLocaleString('en-IN')}</span></div>
+    <div class="cf-row"><span>Delivery</span><span>${delivery===0?'<span style="color:var(--g2)">FREE</span>':'₹'+delivery}</span></div>
+    <div class="cf-row"><span>Platform Fee</span><span style="color:var(--g2)">₹0</span></div>
+    <div class="cf-row total"><span>Total</span><span>₹${(subtotal+delivery).toLocaleString('en-IN')}</span></div>
+    <button class="btn btn-primary btn-block" style="border-radius:12px;padding:14px;font-size:15px;margin-top:12px" onclick="checkout(${subtotal+delivery})">Place Order ₹${(subtotal+delivery).toLocaleString('en-IN')}</button>`;
+}
+
+function cartQty(i,d){state.cart[i].qty=Math.max(1,(state.cart[i].qty||1)+d);DB.set('cart',state.cart);updateCartBadge();renderCartSidebar();}
+function cartRemove(i){state.cart.splice(i,1);DB.set('cart',state.cart);updateCartBadge();renderCartSidebar();}
+
+function checkout(total){
+  state.cart=[];DB.set('cart',state.cart);updateCartBadge();renderCartSidebar();closeCart();
+  toast(`✅ Order placed! ₹${total.toLocaleString('en-IN')} · SMS confirmation sent to your phone`,'success');
+  addNotif('📦','green','Order Confirmed!',`Your order of ₹${total.toLocaleString('en-IN')} has been placed. Delivery in 3-5 days.`);
+  state.coins += 50;DB.set('coins',state.coins);
+  document.getElementById('coinsDisplay').textContent = state.coins;
+}
+
+function toggleWishlist(id, btn){
+  const idx = state.wishlist.indexOf(id);
+  if(idx>-1){state.wishlist.splice(idx,1);toast('Removed from wishlist','info');}
+  else{state.wishlist.push(id);toast('❤️ Added to wishlist','success');}
+  DB.set('wishlist',state.wishlist);
+  if(btn) btn.textContent = state.wishlist.includes(id)?'❤️':'🤍';
+}
+
+// ── ADVISORY ──────────────────────────────
+function renderAdvisoryPage(){
+  renderMyCropsList();
+  renderPestAlerts();
+  renderAIRecs();
+  renderAddCropGrid();
+}
+
+function renderMyCropsList(){
+  const wrap = document.getElementById('myCropsList');
+  const mgr = document.getElementById('manageCropsList');
+  if(!wrap) return;
+  wrap.innerHTML = state.myCrops.length
+    ? state.myCrops.map((c,i)=>`
+      <div class="crop-item-adv" onclick="showCropAdvModal('${c.name}','${c.emoji}')">
+        <div class="cia-emoji">${c.emoji}</div>
+        <div class="cia-info">
+          <div class="cia-name">${c.name}</div>
+          <div class="cia-sow">Sowing: ${c.sowDate||'Not set'}</div>
+          ${!c.sowDate?'<div class="cia-update">Update sowing date</div>':''}
+        </div>
+        <div class="cia-arrow">›</div>
+      </div>`).join('')
+    : `<div style="text-align:center;padding:16px;color:var(--text3)">No crops added. Add a crop to get advisory.</div>`;
+  if(mgr) mgr.innerHTML = state.myCrops.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--g7);border-radius:var(--r);margin-bottom:8px">
+      <span style="font-size:22px">${c.emoji}</span>
+      <span style="font-weight:600;flex:1;font-size:14px">${c.name}</span>
+      <button onclick="removeCrop(${i})" style="background:var(--red);color:#fff;border-radius:50%;width:24px;height:24px;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none">×</button>
+    </div>`).join('');
+}
+
+function renderPestAlerts(){
+  const wrap = document.getElementById('pestAlertsList');
+  if(!wrap) return;
+  wrap.innerHTML = PEST_ALERTS.map(p=>`
+    <div class="pest-alert ${p.cls}">
+      <div class="pa-title">${p.emoji} ${p.name} <span class="badge ${p.level==='High'?'badge-red':p.level==='Medium'?'badge-amber':'badge-green'}">${p.level}</span></div>
+      <div class="pa-desc">🌾 Crop: <b>${p.crop}</b> · 📍 ${p.area}<br>💊 Action: ${p.action}</div>
+    </div>`).join('');
+}
+
+function renderAIRecs(){
+  const wrap = document.getElementById('aiRecsList');
+  if(!wrap) return;
+  wrap.innerHTML = AI_RECS.map(r=>`
+    <div style="display:flex;align-items:center;gap:12px;background:var(--g7);border-radius:var(--r);padding:12px;margin-bottom:8px">
+      <div style="font-size:28px;width:40px;text-align:center;flex-shrink:0">${r.emoji}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">${r.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${r.reason}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--amber)">${r.price}</div>
+        <div style="font-size:10px;color:var(--text3)">${r.conf}% confident</div>
+        <div style="height:3px;background:var(--border2);border-radius:2px;margin-top:3px;width:60px;overflow:hidden">
+          <div style="height:100%;width:${r.conf}%;background:linear-gradient(90deg,var(--g3),var(--amber));border-radius:2px"></div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAddCropGrid(){
+  const wrap = document.getElementById('addCropGrid');
+  if(!wrap) return;
+  const extras = [{name:'Rice',e:'🍚'},{name:'Wheat',e:'🌾'},{name:'Cotton',e:'🤍'},{name:'Tomato',e:'🍅'},{name:'Onion',e:'🧅'},{name:'Soybean',e:'🫘'},{name:'Potato',e:'🥔'},{name:'Chilli',e:'🌶️'},{name:'Grapes',e:'🍇'}];
+  wrap.innerHTML = extras.map(c=>`
+    <div style="text-align:center;cursor:pointer" onclick="quickAddCrop('${c.name}','${c.e}')">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 6px;transition:.15s;position:relative" onmouseenter="this.style.borderColor='var(--g3)'" onmouseleave="this.style.borderColor='var(--border2)'">
+        ${c.e}
+        <div style="position:absolute;bottom:0;right:0;width:18px;height:18px;background:var(--g2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;border:2px solid #fff">+</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2)">${c.name}</div>
+    </div>`).join('');
+}
+
+function quickAddCrop(name, emoji){
+  if(state.myCrops.find(c=>c.name===name)){toast(`${emoji} ${name} already in My Crops!`,'warn');return;}
+  state.myCrops.push({name,emoji,sowDate:''});
+  DB.set('myCrops',state.myCrops);
+  renderAdvisoryPage();
+  toast(`✅ ${name} added to My Crops!`,'success');
+}
+
+function addCrop(){
+  const name = document.getElementById('newCropName').value.trim();
+  const date = document.getElementById('newCropDate').value;
+  if(!name){toast('⚠️ Please enter a crop name','warn');return;}
+  const emojiMap={corn:'🌽',tomato:'🍅',wheat:'🌾',onion:'🧅',rice:'🍚',cotton:'🤍',potato:'🥔',chilli:'🌶️',grapes:'🍇',soybean:'🫘'};
+  const emoji = emojiMap[name.toLowerCase()]||'🌱';
+  state.myCrops.push({name,emoji,sowDate:date});
+  DB.set('myCrops',state.myCrops);
+  renderAdvisoryPage();
+  closeModal('addCropModal');
+  toast(`✅ ${name} added!`,'success');
+  document.getElementById('newCropName').value='';
+  document.getElementById('newCropDate').value='';
+  state.coins+=30;DB.set('coins',state.coins);
+  document.getElementById('coinsDisplay').textContent=state.coins;
+}
+
+function removeCrop(i){
+  const name=state.myCrops[i].name;state.myCrops.splice(i,1);DB.set('myCrops',state.myCrops);renderAdvisoryPage();toast(`Removed ${name}`,'info');
+}
+
+function showCropAdvModal(name, emoji){
+  const ADVISORY = {
+    Corn:['🌱 Stage: Vegetative V6','💧 Water every 5–7 days','🧪 Apply Urea 2nd dose this week','⚠️ Watch for Fall Armyworm','✅ Looking healthy — 75% survival rate'],
+    Tomato:['🌸 Stage: Flowering','💧 Drip irrigation recommended','🐛 Spray for whitefly control','🧪 Foliar potassium spray now','📋 Harvest in 15–20 days'],
+    Wheat:['🌾 Stage: Grain filling','💧 Last irrigation this week','⚠️ Watch for rust disease','📋 Harvest expected April 2026'],
+  };
+  const adv = ADVISORY[name]||['📋 Add sowing date for detailed advisory.'];
+  toast(`${emoji} ${name}: ${adv[0]}`,'info');
+}
+
+// ── VIDEOS ────────────────────────────────
+function renderVideosPage(){
+  const cats=['All','Nutrition','Seeds','Disease','Pest','Irrigation','Organic','Equipment'];
+  const filterWrap = document.getElementById('videoFilterRow');
+  if(filterWrap) filterWrap.innerHTML = cats.map((c,i)=>`
+    <div class="cat-chip ${i===0?'active':''}" onclick="filterVideos('${c}',this)">${c}</div>`).join('');
+  renderVideoGrid('All');
+}
+
+function filterVideos(cat,btn){
+  if(btn){document.querySelectorAll('#videoFilterRow .cat-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  renderVideoGrid(cat);
+}
+
+function renderVideoGrid(cat){
+  const vids = cat==='All'?VIDEOS:VIDEOS.filter(v=>v.cat===cat);
+  const grid = document.getElementById('videosGrid');
+  if(!grid) return;
+  const bgs=['#0d3b12','#1a3d1a','#0d2d1a','#1a4a1a','#12351a','#0d3a20'];
+  grid.innerHTML = vids.map((v,i)=>`
+    <div class="video-card" onclick="openVideoPlayer('${v.title}','${v.emoji}','${v.channel}')">
+      <div class="vc-thumb" style="background:linear-gradient(135deg,${bgs[i%bgs.length]},${bgs[(i+1)%bgs.length]})">${v.emoji}</div>
+      <div class="vc-overlay"></div>
+      <div class="vc-play">▶</div>
+      <div class="vc-info">
+        <div class="vc-channel"><span class="badge badge-green" style="font-size:9px">▶</span>${v.channel}</div>
+        <div class="vc-title">${v.title}</div>
+        <div class="vc-views">👁 ${v.views} views</div>
+      </div>
+    </div>`).join('');
+}
+
+function openVideoPlayer(title,emoji,channel){
+  toast(`▶ Playing: ${title}`,'info');
+}
+
+// ── SCHEMES ───────────────────────────────
+function renderSchemes(){
+  const grid = document.getElementById('schemesGrid');
+  if(!grid) return;
+  grid.innerHTML = SCHEMES.map(s=>`
+    <div class="scheme-card">
+      <div class="scc-top">
+        <div class="scc-icon">${s.icon}</div>
+        <div>
+          <div class="scc-title">${s.title}</div>
+          <span class="badge badge-green" style="margin-top:4px">${s.tag}</span>
+        </div>
+      </div>
+      <div class="scc-desc">${s.desc}</div>
+      <div class="scc-btns">
+        <button class="btn btn-primary btn-sm" onclick="toast('Opening ${s.title}...','info')">${s.btn}</button>
+        <button class="btn btn-ghost btn-sm" onclick="toast('SMS sent with ${s.title} details!','success')">📱 SMS Info</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── RETAILERS ─────────────────────────────
+function renderRetailers(filter){
+  const data = filter&&filter!=='All' ? RETAILERS.filter(r=>r.tags.some(t=>t.includes(filter))) : RETAILERS;
+  document.getElementById('retailerCount').textContent = data.length;
+  const grid = document.getElementById('retailersGrid');
+  if(!grid) return;
+  grid.innerHTML = data.map(r=>`
+    <div class="retailer-card">
+      <div class="rc-header">
+        <div class="rc-avatar">${r.emoji}</div>
+        <div>
+          <div class="rc-name">${r.name}</div>
+          <div class="rc-dist"><i class="fas fa-map-marker-alt" style="color:var(--g3)"></i> ${r.dist} from you</div>
+          <div class="rc-stars">${'⭐'.repeat(Math.round(r.rating))} ${r.rating}</div>
+        </div>
+      </div>
+      <div class="rc-tags">${r.tags.map(t=>`<span class="badge badge-green">${t}</span>`).join('')}</div>
+      <div class="rc-btns">
+        <button class="rc-call" onclick="callRetailer('${r.name}','${r.phone}')"><i class="fas fa-phone"></i> Call</button>
+        <button class="rc-whatsapp" onclick="whatsappRetailer('${r.name}','${r.phone}')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        <button class="rc-directions" onclick="getDirections('${r.name}')"><i class="fas fa-directions"></i> Go</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterRetailers(filter){ renderRetailers(filter); }
+function callRetailer(name,phone){toast(`📞 Calling ${name}: +91 ${phone}`,'info');window.location.href=`tel:+91${phone}`;}
+function whatsappRetailer(name,phone){toast(`📱 Opening WhatsApp for ${name}`,'success');window.open(`https://wa.me/91${phone}?text=Hello, I found you on FarmRise. I need agricultural inputs.`);}
+function getDirections(name){toast(`🗺️ Getting directions to ${name}`,'info');window.open(`https://www.google.com/maps/search/${encodeURIComponent(name+' Belagavi Karnataka')}`);}
+
+// ── NEWS ──────────────────────────────────
+function renderNewsPage(){
+  const cats=['All','Market','Weather','Government','Alert'];
+  const filterWrap = document.getElementById('newsFilterRow');
+  if(filterWrap) filterWrap.innerHTML = cats.map((c,i)=>`<span class="cat-chip ${i===0?'active':''}" onclick="filterNews('${c}',this)">${c}</span>`).join('');
+  const grid = document.getElementById('newsGrid');
+  if(!grid) return;
+  grid.innerHTML = NEWS.map(n=>`
+    <div class="news-card" onclick="toast('📰 Opening: ${n.title.slice(0,40)}...','info')">
+      <div class="nc-img">${n.emoji}</div>
+      <div class="nc-body">
+        <div class="nc-tag"><span class="badge badge-${n.tag==='Alert'?'red':n.tag==='Market'?'green':'blue'}">${n.tag}</span></div>
+        <div class="nc-title">${n.title}</div>
+        <div class="nc-meta"><div class="nc-date">${n.date}</div><div class="nc-read">Read more →</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function filterNews(cat,btn){
+  if(btn){document.querySelectorAll('#newsFilterRow .cat-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const news = cat==='All'?NEWS:NEWS.filter(n=>n.cat===cat||n.tag===cat);
+  const grid = document.getElementById('newsGrid');
+  if(!grid) return;
+  grid.innerHTML = news.map(n=>`
+    <div class="news-card" onclick="toast('📰 Opening article...','info')">
+      <div class="nc-img">${n.emoji}</div>
+      <div class="nc-body">
+        <div class="nc-tag"><span class="badge badge-green">${n.tag}</span></div>
+        <div class="nc-title">${n.title}</div>
+        <div class="nc-meta"><div class="nc-date">${n.date}</div><div class="nc-read">Read more →</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── NOTIFICATIONS ─────────────────────────
+function renderNotifPanel(){
+  const wrap = document.getElementById('notifItems');
+  if(!wrap) return;
+  const notifs = DB.get('notifs')||NOTIFS;
+  wrap.innerHTML = notifs.map(n=>`
+    <div class="np-item ${n.read?'':'unread'}" onclick="markNotifRead('${n.id}')">
+      <div class="npi-icon npi-${n.cls}">${n.icon}</div>
+      <div style="flex:1">
+        <div class="npi-title">${n.title}</div>
+        <div class="npi-body">${n.body}</div>
+        <div class="npi-time">⏰ ${n.time}</div>
+      </div>
+      ${!n.read?'<div style="width:8px;height:8px;background:var(--g3);border-radius:50%;flex-shrink:0;margin-top:4px"></div>':''}
+    </div>`).join('');
+}
+
+function addNotif(icon,cls,title,body){
+  const notifs = DB.get('notifs')||[...NOTIFS];
+  const newNotif = {id:'n'+Date.now(),icon,cls,title,body,time:'Just now',read:false};
+  notifs.unshift(newNotif);
+  DB.set('notifs',notifs);
+  const unread = notifs.filter(n=>!n.read).length;
+  const badge = document.getElementById('notifBadge');
+  if(badge) badge.textContent=unread;
+  renderNotifPanel();
+}
+
+function markNotifRead(id){
+  const notifs = DB.get('notifs')||NOTIFS;
+  const n = notifs.find(x=>x.id===id);
+  if(n) n.read=true;
+  DB.set('notifs',notifs);
+  renderNotifPanel();
+  const unread = notifs.filter(x=>!x.read).length;
+  const badge = document.getElementById('notifBadge');
+  if(badge) badge.textContent=unread;
+}
+
+function markAllRead(){
+  const notifs = DB.get('notifs')||NOTIFS;
+  notifs.forEach(n=>n.read=true);
+  DB.set('notifs',notifs);
+  renderNotifPanel();
+  const badge = document.getElementById('notifBadge');
+  if(badge) badge.textContent=0;
+  toast('✅ All notifications marked as read','success');
+}
+
+function openNotifPanel(){document.getElementById('notifPanel').classList.add('open');document.getElementById('npOverlay').classList.add('show');}
+function closeNotifPanel(){document.getElementById('notifPanel').classList.remove('open');document.getElementById('npOverlay').classList.remove('show');}
+
+// ── PHONE CONNECT ─────────────────────────
+function connectPhone(context){
+  const inp = document.getElementById(context==='schemes'?'schemesPhoneInp':'phoneConnectInp');
+  const phone = inp?.value?.trim()||'';
+  if(!phone||phone.length!==10){toast('⚠️ Enter a valid 10-digit mobile number','warn');return;}
+  document.getElementById('otpSubtext').textContent = `OTP sent to +91 ${phone}`;
+  openModal('otpModal');
+  toast(`📱 OTP sent to +91 ${phone}`,'success');
+}
+
+function verifyOTP(){
+  const otp = document.getElementById('otpInput').value;
+  if(!otp||otp.length<4){toast('⚠️ Enter the OTP','warn');return;}
+  closeModal('otpModal');
+  toast('✅ Phone connected! You will now receive SMS alerts.','success');
+  addNotif('📱','green','Phone Connected!','You are now subscribed to SMS alerts for mandi prices, weather and pest outbreaks.');
+  state.coins += 50;DB.set('coins',state.coins);
+  document.getElementById('coinsDisplay').textContent=state.coins;
+  document.getElementById('otpInput').value='';
+}
+
+function detectLocation(){
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{toast(`📍 Location detected: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,'success');closeModal('locationModal');},()=>toast('Location access denied','warn'));
+  } else toast('Geolocation not supported','error');
+}
+
+// ── PROFILE ───────────────────────────────
+function renderProfileData(){
+  const p = DB.get('profile')||{};
+  if(p.name){
+    document.getElementById('profileHeroName').textContent=p.name;
+    const el=document.getElementById('navName');if(el)el.textContent=p.name.split(' ')[0];
+    const av=document.getElementById('navAvatar');if(av)av.textContent=p.name[0]?.toUpperCase()||'U';
+    const el2=document.getElementById('profileName');if(el2)el2.value=p.name;
+  }
+  document.getElementById('profileOrders').textContent=DB.get('orderCount')||'0';
+  document.getElementById('profileCoins').textContent=state.coins;
+  document.getElementById('profileCrops').textContent=state.myCrops.length;
+  document.getElementById('modalCoins').textContent=state.coins+' Coins';
+  document.getElementById('coinsDisplay').textContent=state.coins;
+}
+
+function saveProfile(){
+  const name=document.getElementById('profileName').value.trim();
+  const phone=document.getElementById('profilePhone').value.trim();
+  const st=document.getElementById('profileState').value;
+  const dist=document.getElementById('profileDistrict').value.trim();
+  if(!name){toast('⚠️ Please enter your name','warn');return;}
+  const profile={name,phone,state:st,district:dist};
+  DB.set('profile',profile);
+  state.profile=profile;
+  renderProfileData();
+  closeModal('editProfileModal');
+  toast('✅ Profile saved successfully!','success');
+  state.coins+=50;DB.set('coins',state.coins);
+  renderProfileData();
+}
+
+// ── COINS ─────────────────────────────────
+function renderCoinsEarnList(){
+  const items=[
+    {e:'✅',t:'Complete your profile',c:'+50 coins'},
+    {e:'📋',t:'Add 3 crops to advisory',c:'+30 coins'},
+    {e:'🩺',t:'Use Crop Doctor',c:'+20 coins/use'},
+    {e:'🔍',t:'Verify Bayer product',c:'+25 coins'},
+    {e:'👥',t:'Refer a friend',c:'+50 coins/referral'},
+    {e:'🛒',t:'Place an order',c:'+10 coins/order'},
+    {e:'📱',t:'Connect your phone',c:'+50 coins'},
+    {e:'📰',t:'Read 5 articles daily',c:'+10 coins/day'},
+  ];
+  const wrap=document.getElementById('coinsEarnList');
+  if(!wrap) return;
+  wrap.innerHTML=items.map(i=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2)"><span style="font-size:20px">${i.e}</span><div style="flex:1;font-size:13px;font-weight:500;color:var(--text)">${i.t}</div><div style="font-size:13px;font-weight:700;color:var(--g2)">${i.c}</div></div>`).join('');
+}
+
+// ── CROP DOCTOR ───────────────────────────
+function showCropDoctorModal(){openModal('cropDoctorModal');}
+
+function simulateDiagnosis(){
+  const area=document.getElementById('cdUploadArea');
+  if(area){area.innerHTML=`<div style="font-size:48px;margin-bottom:10px">⏳</div><div style="font-weight:700;font-size:15px;color:var(--g2)">Analysing...</div>`;}
+  setTimeout(()=>{
+    if(area){area.innerHTML=`<div style="font-size:48px;margin-bottom:10px">✅</div><div style="font-weight:700;font-size:15px;color:var(--g2)">Analysis Complete</div><div style="font-size:12px;color:var(--text3);margin-top:4px">Tap to scan another image</div>`;}
+    document.getElementById('diagnosisResult').style.display='block';
+    toast('🔬 Disease detected! See results below.','warn');
+    addNotif('🩺','red','Crop Disease Detected','Early Blight found on your crop. Check Crop Doctor for treatment.','Just now');
+    state.coins+=20;DB.set('coins',state.coins);
+    document.getElementById('coinsDisplay').textContent=state.coins;
+  },2000);
+}
+
+function simulateVerify(){
+  toast('🔍 Verifying...','info');
+  setTimeout(()=>{
+    document.getElementById('verifyResult').style.display='block';
+    toast('✅ Product is authentic!','success');
+    state.coins+=25;DB.set('coins',state.coins);
+    document.getElementById('coinsDisplay').textContent=state.coins;
+  },1500);
+}
+
+// ── FLASH TIMER ───────────────────────────
+function startFlashTimer(){
+  setInterval(()=>{
+    state.flashTime=Math.max(0,state.flashTime-1);
+    const h=Math.floor(state.flashTime/3600);
+    const m=Math.floor((state.flashTime%3600)/60);
+    const s=state.flashTime%60;
+    const str=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    ['flashTimer','shopFlashTimer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=str;});
+  },1000);
+}
+
+// ── SEARCH ────────────────────────────────
+function globalSearchFn(q){
+  if(!q) return;
+  const lower=q.toLowerCase();
+  const crop=CROPS.find(c=>c.label.toLowerCase().includes(lower));
+  if(crop){showPage('mandi');setActiveCrop(crop.id);toast(`Showing prices for ${crop.label}`,'info');}
+  else {
+    const prod=PRODUCTS.find(p=>p.name.toLowerCase().includes(lower)||p.cat.toLowerCase().includes(lower));
+    if(prod){showPage('shop');filterShop(prod.cat);}
+    else toast(`Searching: "${q}"...`,'info');
+  }
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const map={home:'homePage',mandi:'mandiPage',shop:'shopPage',advisory:'advisoryPage',videos:'videosPage',schemes:'schemesPage',retailers:'retailersPage',news:'newsPage',more:'morePage'};
+  const el=document.getElementById(map[name]||name+'Page');
+  if(el){el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+
+  // Update nav
+  ['home','mandi','shop','advisory','videos','more'].forEach(n=>{
+    const nl=document.getElementById('nl-'+n);if(nl)nl.classList.toggle('active',n===name);
+    const sn=document.getElementById('sn-'+n);if(sn)sn.classList.toggle('active',n===name);
+    const mn=document.getElementById('mn-'+n);if(mn)mn.classList.toggle('active',n===name);
+  });
+  ['schemes','retailers','news'].forEach(n=>{
+    const sn=document.getElementById('sn-'+n);if(sn)sn.classList.toggle('active',n===name);
+  });
+
+  // Page-specific init
+  if(name==='mandi'){setActiveCrop(state.activeCrop);}
+  if(name==='more'){renderCoinsEarnList();}
+}
+
+// ══════════════════════════════════════════
+//  MODAL HELPERS
+// ══════════════════════════════════════════
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+
+function toggleNotif(el){
+  const tr=document.getElementById('swTr'),th=document.getElementById('swTh');
+  if(el.checked){tr.classList.add('on');th.style.transform='translateX(20px)';toast('🔔 Notifications enabled','success');}
+  else{tr.classList.remove('on');th.style.transform='translateX(0)';toast('🔕 Notifications disabled','info');}
+}
+
+function confirmLogout(){
+  if(confirm('Are you sure you want to logout?')){
+    DB.set('profile',null);
+    document.getElementById('profileHeroName').textContent='Your Name';
+    document.getElementById('navName').textContent='My Farm';
+    toast('👋 Logged out successfully','info');
+    showPage('home');
+  }
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className=`toast-item ${type}`;t.textContent=msg;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},3000);
+}
+
+// ══════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+    closeCart();closeNotifPanel();
+  }
+});
+
+// ══════════════════════════════════════════
+//  REAL-TIME SIMULATION
+// ══════════════════════════════════════════
+function simulateRealTime(){
+  const events=[
+    ()=>{
+      const crops=Object.keys(MANDI_PRICES);
+      const c=crops[Math.floor(Math.random()*crops.length)];
+      const cr=CROPS.find(x=>x.id===c);
+      const price=MANDI_PRICES[c][0];
+      if(price){
+        const change=Math.floor(Math.random()*100)-50;
+        price.lo+=change;price.hi+=change;
+        toast(`📊 ${cr?.emoji} ${cr?.label}: ₹${price.hi}/100kg`,'info');
+        document.getElementById('notifBar').classList.add('show');
+        document.getElementById('notifBarMsg').textContent=`📈 ${cr?.emoji} ${cr?.label} prices updated at ${price.name} mandi!`;
+      }
+    },
+    ()=>addNotif('🌾','green','Market Update','Corn prices rising in 3 mandis near you. Check now.'),
+    ()=>addNotif('🌧️','blue','Weather Alert','Rain expected in 2 hours. Delay outdoor farm activities.'),
+  ];
+  if(Math.random()>0.6) events[Math.floor(Math.random()*events.length)]();
+}
+
+// ══════════════════════════════════════════
+//  PWA + SERVICE WORKER
+// ══════════════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    console.log('FarmRise PWA ready');
+    toast('🌾 FarmRise loaded — Real-time data active','success');
+  });
+}
+
+// Online/offline detection
+window.addEventListener('offline',()=>toast('📶 You are offline. Showing cached data.','warn'));
+window.addEventListener('online',()=>toast('🌐 Back online! Syncing latest data...','success'));
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+window.onload = ()=>{
+  renderAll();
+  // Show notification bar after 3 seconds
+  setTimeout(()=>{document.getElementById('notifBar').classList.add('show');},3000);
+  // Real-time simulation every 12 seconds
+  setInterval(simulateRealTime,12000);
+  // Update cart badge
+  updateCartBadge();
+};
+</script>
+</body>
+</html>
